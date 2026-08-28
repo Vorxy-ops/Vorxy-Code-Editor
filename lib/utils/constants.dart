@@ -1,6 +1,6 @@
 class AppConstants {
   static const String appName = 'Vorxy Code Editor';
-  static const String version = '1.0.0';
+  static const String version = '3.2.0';
   static const String developer = 'GOSTOWN Co.';
   static const String telegramChannel = 'https://t.me/VorxyCodeEditor';
   static const String telegramChat = 'https://t.me/VorxyCodeEditorChat';
@@ -33,6 +33,7 @@ class AppConstants {
       'errors': 'Ошибки',
       'terminal': 'Терминал',
       'dark_theme': 'Тёмная тема',
+      'light_theme': 'Светлая тема',
       'auto_save': 'Автосохранение',
       'font_size': 'Размер шрифта',
       'tabulation': 'Табуляция',
@@ -124,7 +125,11 @@ class AppConstants {
       'about_app': 'О приложении',
       'privacy_title': 'Политика конфиденциальности',
       'terms_title': 'Пользовательское соглашение',
-      'light_theme': 'Светлая тема',
+      'description': 'Профессиональная мобильная среда разработки для Android',
+      'features': 'Функциональные возможности',
+      'system_requirements': 'Системные требования',
+      'features_list': 'Редактор кода с подсветкой синтаксиса, поиск и замена, форматирование, 10 языков программирования, файловый менеджер, 13 языков интерфейса, тёмная и светлая тема',
+      'system_requirements_list': 'Android 7.0 и выше, 50 МБ свободного места',
     },
     'en': {
       'app_name': 'Vorxy Code Editor',
@@ -228,6 +233,11 @@ class AppConstants {
       'about_app': 'About',
       'privacy_title': 'Privacy Policy',
       'terms_title': 'Terms of Service',
+      'description': 'Professional mobile development environment for Android',
+      'features': 'Features',
+      'system_requirements': 'System Requirements',
+      'features_list': 'Code editor with syntax highlighting, search and replace, formatting, 10 programming languages, file manager, 13 interface languages, dark and light theme',
+      'system_requirements_list': 'Android 7.0 and above, 50 MB free space',
     },
   };
 
