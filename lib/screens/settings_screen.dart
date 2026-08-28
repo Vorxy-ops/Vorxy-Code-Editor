@@ -20,8 +20,6 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   bool _darkMode = true;
-  double _fontSize = 16;
-  int _tabSize = 4;
   bool _autoSave = true;
   String _currentLanguage = 'ru';
   String _currentLanguageName = 'Русский';
@@ -41,8 +39,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       _darkMode = prefs.getBool('darkMode') ?? true;
-      _fontSize = prefs.getDouble('fontSize') ?? 16;
-      _tabSize = prefs.getInt('tabSize') ?? 4;
       _autoSave = prefs.getBool('autoSave') ?? true;
       _currentLanguage = prefs.getString('language') ?? 'ru';
       _currentLanguageName = AppConstants.supportedLanguages.firstWhere(
@@ -55,8 +51,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _saveSettings() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('darkMode', _darkMode);
-    await prefs.setDouble('fontSize', _fontSize);
-    await prefs.setInt('tabSize', _tabSize);
     await prefs.setBool('autoSave', _autoSave);
     await prefs.setString('language', _currentLanguage);
     widget.onThemeChanged(_darkMode);
@@ -68,7 +62,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       builder: (context) => AlertDialog(
         backgroundColor: AppTheme.cardPurple,
         title: const Text(
-          'Выберите язык / Select language',
+          'Выберите язык',
           style: TextStyle(color: AppTheme.accentGold),
         ),
         content: SizedBox(
@@ -159,42 +153,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ListTile(
               leading: const Icon(Icons.language, color: AppTheme.accentGold),
               title: Text(_getTranslation('language')),
-              subtitle: Text('$_currentLanguageName (${_currentLanguage.toUpperCase()})'),
+              subtitle: Text('$_currentLanguageName'),
               onTap: _showLanguageDialog,
-            ),
-          ]),
-          _buildSection(_getTranslation('editor'), [
-            ListTile(
-              title: Text(_getTranslation('font_size')),
-              subtitle: Slider(
-                value: _fontSize,
-                min: 12,
-                max: 24,
-                divisions: 6,
-                activeColor: AppTheme.accentGold,
-                label: _fontSize.toStringAsFixed(0),
-                onChanged: (value) => setState(() => _fontSize = value),
-              ),
-            ),
-            ListTile(
-              title: Text(_getTranslation('tabulation')),
-              subtitle: Row(
-                children: [
-                  ChoiceChip(
-                    label: const Text('2'),
-                    selected: _tabSize == 2,
-                    onSelected: (_) => setState(() => _tabSize = 2),
-                    selectedColor: AppTheme.accentGold,
-                  ),
-                  const SizedBox(width: 8),
-                  ChoiceChip(
-                    label: const Text('4'),
-                    selected: _tabSize == 4,
-                    onSelected: (_) => setState(() => _tabSize = 4),
-                    selectedColor: AppTheme.accentGold,
-                  ),
-                ],
-              ),
             ),
           ]),
           _buildSection(_getTranslation('support'), [
@@ -224,12 +184,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ]),
           _buildSection(_getTranslation('about_app'), [
             ListTile(
-              title: const Text('Описание / Description'),
+              title: const Text('Описание'),
               subtitle: Text(_getTranslation('description')),
-            ),
-            ListTile(
-              title: Text(_getTranslation('features')),
-              subtitle: Text(_getTranslation('features_list')),
             ),
             ListTile(
               title: Text(_getTranslation('system_requirements')),
@@ -249,14 +205,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
               subtitle: Text(AppConstants.developer),
             ),
             ListTile(
-              title: const Text('Авторские права / Copyright'),
+              title: const Text('Авторские права'),
               subtitle: const Text('© 2026 GOSTOWN Co. All rights reserved.'),
             ),
-            _buildActionTile(_getTranslation('exit'), Icons.exit_to_app, () => Navigator.of(context).popUntil((route) => route.isFirst)),
+            _buildActionTile(_getTranslation('exit'), Icons.exit_to_app, _exitApp),
           ]),
         ],
       ),
     );
+  }
+
+  void _exitApp() {
+    Navigator.of(context).popUntil((route) => route.isFirst);
   }
 
   Widget _buildSection(String title, List<Widget> children) {
@@ -314,14 +274,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: AppTheme.cardPurple,
+      backgroundColor: AppTheme.primaryPurple,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) => DraggableScrollableSheet(
-        initialChildSize: 0.9,
+        initialChildSize: 0.75,
         minChildSize: 0.5,
-        maxChildSize: 0.95,
+        maxChildSize: 0.9,
         expand: false,
         builder: (context, scrollController) => Padding(
           padding: const EdgeInsets.all(16),
