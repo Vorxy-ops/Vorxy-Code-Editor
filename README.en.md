@@ -1,27 +1,19 @@
 # Vorxy Code Editor
 
-Professional mobile development environment for Android.
+Mobile development environment for creating and editing code in 10 programming languages.
 
 ---
 
 ## About
 
-Vorxy Code Editor is a full-featured integrated development environment (IDE) for Android mobile devices. The application provides the ability to write, edit and save code in 10 programming languages with syntax highlighting, search and replace, and code formatting.
+Vorxy Code Editor is a mobile development environment for Android devices. The application allows you to write, edit and save code in 10 programming languages with syntax highlighting.
 
-The application is designed for programmers, students and anyone who wants to have access to their code anytime, anywhere without the need for a desktop computer.
+The application is designed for programmers, students and anyone who wants to have access to their code anytime, anywhere.
 
 ---
 
-## Features
+## Supported Languages
 
-### Code Editor
-- Syntax highlighting for 10 programming languages
-- Line numbering
-- Search and replace text
-- Code formatting (Python, C-like languages)
-- Line count display
-
-### Supported Languages
 - Python
 - C
 - C++
@@ -33,53 +25,12 @@ The application is designed for programmers, students and anyone who wants to ha
 - R
 - Rust
 
-### File Manager
-- Create new files
-- Open existing files
-- Save files
-- Rename files
-- Delete files
-- Auto-save last opened file
-
-### Settings
-- Toggle between dark and light themes
-- Font size adjustment (12 to 24)
-- Tab size selection (2 or 4 spaces)
-- Auto-save
-- Interface language selection (13 languages)
-
-### Localization
-- Русский
-- English
-- Українська
-- Español
-- Français
-- Deutsch
-- 简体中文
-- 日本語
-- 한국어
-- Português
-- Italiano
-- العربية
-- हिन्दी
-
-### Support
-- Navigate to Telegram channel
-- Navigate to Telegram chat
-- Send error report via email
-
-### Legal Information
-- Privacy Policy
-- Terms of Service
-- Copyright information
-
 ---
 
 ## System Requirements
 
-- Android 7.0 (API 24) and above
-- 50 MB free space
-- Internet connection (not required for editor operation)
+- Android 7.0 and above
+- 25 MB free space
 
 ---
 
