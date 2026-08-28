@@ -216,6 +216,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ]),
           _buildSection(_getTranslation('about_app'), [
             ListTile(
+              title: const Text('Описание / Description'),
+              subtitle: Text(_getTranslation('description')),
+            ),
+            ListTile(
+              title: Text(_getTranslation('features')),
+              subtitle: Text(_getTranslation('features_list')),
+            ),
+            ListTile(
+              title: Text(_getTranslation('system_requirements')),
+              subtitle: Text(_getTranslation('system_requirements_list')),
+            ),
+            const Divider(color: AppTheme.accentGold),
+            ListTile(
               title: Text(_getTranslation('name')),
               subtitle: Text(AppConstants.appName),
             ),
