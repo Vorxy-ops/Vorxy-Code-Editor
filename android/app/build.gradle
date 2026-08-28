@@ -1,12 +1,12 @@
 plugins {
     id "com.android.application"
-    id "kotlin-android"
+    id "org.jetbrains.kotlin.android"
     id "dev.flutter.flutter-gradle-plugin"
 }
 
 android {
     namespace 'com.vorxy.code_editor'
-    compileSdk 34
+    compileSdk 36
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
@@ -20,7 +20,7 @@ android {
     defaultConfig {
         applicationId "com.vorxy.code_editor"
         minSdk 24
-        targetSdk 34
+        targetSdk 36
         versionCode 3
         versionName "3.2.0"
         multiDexEnabled true
