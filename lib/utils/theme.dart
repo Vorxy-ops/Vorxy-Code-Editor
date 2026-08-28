@@ -11,7 +11,6 @@ class AppTheme {
   static const Color darkText = Color(0xFF1A0B2E);
   static const Color lightCard = Color(0xFFF5F3FF);
 
-  // Тёмная тема (фиолетовый фон, жёлтые акценты)
   static ThemeData darkTheme = ThemeData(
     brightness: Brightness.dark,
     primaryColor: primaryPurple,
@@ -59,7 +58,6 @@ class AppTheme {
     ),
   );
 
-  // Светлая тема (белый фон, фиолетовые акценты)
   static ThemeData lightTheme = ThemeData(
     brightness: Brightness.light,
     primaryColor: primaryPurple,
