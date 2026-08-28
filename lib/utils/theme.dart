@@ -54,53 +54,6 @@ class AppTheme {
     ),
   );
 
-  static ThemeData lightTheme = ThemeData(
-    brightness: Brightness.light,
-    primaryColor: Colors.white,
-    scaffoldBackgroundColor: Colors.white,
-    appBarTheme: const AppBarTheme(
-      backgroundColor: Colors.white,
-      elevation: 1,
-      centerTitle: true,
-      titleTextStyle: TextStyle(
-        color: Color(0xFF1A0B2E),
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
-      ),
-    ),
-    cardTheme: const CardThemeData(
-      color: Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(12)),
-        side: BorderSide(color: Color(0xFF1A0B2E), width: 1),
-      ),
-    ),
-    elevatedButtonTheme: ElevatedButtonThemeData(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Color(0xFF1A0B2E),
-        foregroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-        textStyle: const TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: 16,
-        ),
-      ),
-    ),
-    textTheme: const TextTheme(
-      bodyLarge: TextStyle(color: Colors.black87),
-      bodyMedium: TextStyle(color: Colors.black87),
-      titleLarge: TextStyle(color: Color(0xFF1A0B2E), fontWeight: FontWeight.bold),
-    ),
-    bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-      backgroundColor: Colors.white,
-      selectedItemColor: Color(0xFF1A0B2E),
-      unselectedItemColor: Colors.grey,
-      elevation: 8,
-    ),
-  );
-
   static Map<String, TextStyle> get codeTheme {
     return vsTheme;
   }
