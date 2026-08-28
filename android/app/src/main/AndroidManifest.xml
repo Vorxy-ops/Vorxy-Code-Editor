@@ -7,7 +7,6 @@
     <application
         android:label="Vorxy Code Editor"
         android:name="${applicationName}"
-        android:extractNativeLibs="true"
         android:usesCleartextTraffic="true">
 
         <meta-data
