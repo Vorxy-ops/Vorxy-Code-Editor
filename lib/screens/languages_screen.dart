@@ -14,6 +14,7 @@ class LanguagesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final languages = _getLocalizedLanguages(currentLanguage);
     return Scaffold(
       appBar: AppBar(
         title: Text(_getTranslation('languages')),
@@ -27,7 +28,7 @@ class LanguagesScreen extends StatelessWidget {
             crossAxisSpacing: 12,
             mainAxisSpacing: 12,
           ),
-          itemCount: 10,
+          itemCount: languages.length,
           itemBuilder: (context, index) {
             final language = languages[index];
             return Card(
@@ -38,7 +39,7 @@ class LanguagesScreen extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        language['name'],
+                        language['name'] ?? '',
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -48,7 +49,7 @@ class LanguagesScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        language['description'],
+                        language['description'] ?? '',
                         style: const TextStyle(
                           fontSize: 12,
                           color: Colors.grey,
@@ -65,17 +66,25 @@ class LanguagesScreen extends StatelessWidget {
       ),
     );
   }
-}
 
-const List<Map<String, String>> languages = [
-  {'name': 'Python', 'description': 'AI, веб, наука о данных'},
-  {'name': 'C', 'description': 'Операционные системы и железо'},
-  {'name': 'C++', 'description': 'Игры и высоконагруженные системы'},
-  {'name': 'Java', 'description': 'Корпоративная разработка и Android'},
-  {'name': 'C#', 'description': 'Windows-приложения и Unity'},
-  {'name': 'JavaScript', 'description': 'Веб-разработка и серверы'},
-  {'name': 'Visual Basic', 'description': 'Классические Windows-приложения'},
-  {'name': 'SQL', 'description': 'Работа с базами данных'},
-  {'name': 'R', 'description': 'Статистика и научные исследования'},
-  {'name': 'Rust', 'description': 'Безопасные высоконагруженные системы'},
-];
+  List<Map<String, String>> _getLocalizedLanguages(String langCode) {
+    final translations = AppConstants.languageDescriptions[langCode] ?? AppConstants.languageDescriptions['ru']!;
+    return const [
+      {'name': 'Python', 'key': 'python'},
+      {'name': 'C', 'key': 'c'},
+      {'name': 'C++', 'key': 'cpp'},
+      {'name': 'Java', 'key': 'java'},
+      {'name': 'C#', 'key': 'csharp'},
+      {'name': 'JavaScript', 'key': 'js'},
+      {'name': 'Visual Basic', 'key': 'vb'},
+      {'name': 'SQL', 'key': 'sql'},
+      {'name': 'R', 'key': 'r'},
+      {'name': 'Rust', 'key': 'rust'},
+    ].map((lang) {
+      return {
+        'name': lang['name']!,
+        'description': translations[lang['key']] ?? lang['name']!,
+      };
+    }).toList();
+  }
+}
