@@ -129,7 +129,7 @@ class _EditorScreenState extends State<EditorScreen> {
                   onChanged: (value) {
                     setState(() {
                       _language = value!;
-                      if (_language == 'HTML') {
+                      if (_language == 'HTML' && _code.isEmpty) {
                         _code = '<!DOCTYPE html>\n<html>\n<head>\n    <title>My Page</title>\n</head>\n<body>\n    <h1>Hello, World!</h1>\n</body>\n</html>';
                       }
                       _currentFile = 'main${_getExtension(_language)}';
