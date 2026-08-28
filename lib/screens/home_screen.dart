@@ -8,9 +8,7 @@ import '../utils/theme.dart';
 import '../utils/constants.dart';
 
 class HomeScreen extends StatefulWidget {
-  final Function(bool) onThemeChanged;
-
-  const HomeScreen({super.key, required this.onThemeChanged});
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -20,32 +18,22 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
   String _currentLanguage = 'ru';
   late List<Widget> _pages;
-  bool _isDarkMode = true;
 
   @override
   void initState() {
     super.initState();
-    _loadSettings();
+    _loadLanguage();
   }
 
-  Future<void> _loadSettings() async {
+  Future<void> _loadLanguage() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       _currentLanguage = prefs.getString('language') ?? 'ru';
-      _isDarkMode = prefs.getBool('darkMode') ?? true;
       _pages = [
         LanguagesScreen(currentLanguage: _currentLanguage),
         EditorScreen(currentLanguage: _currentLanguage),
         FilesScreen(currentLanguage: _currentLanguage),
-        SettingsScreen(
-          currentLanguage: _currentLanguage,
-          onThemeChanged: (isDark) {
-            setState(() {
-              _isDarkMode = isDark;
-            });
-            widget.onThemeChanged(isDark);
-          },
-        ),
+        SettingsScreen(currentLanguage: _currentLanguage),
       ];
     });
   }
