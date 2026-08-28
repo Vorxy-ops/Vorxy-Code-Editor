@@ -26,6 +26,12 @@ android {
         multiDexEnabled true
     }
 
+    packagingOptions {
+        jniLibs {
+            useLegacyPackaging = true
+        }
+    }
+
     buildTypes {
         release {
             signingConfig signingConfigs.debug
