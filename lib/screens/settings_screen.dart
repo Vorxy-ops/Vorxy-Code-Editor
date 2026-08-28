@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../utils/constants.dart';
 import '../utils/theme.dart';
+import '../utils/constants.dart';
 
 class SettingsScreen extends StatefulWidget {
   final String currentLanguage;
@@ -19,98 +19,60 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  bool _darkMode = true;
-  bool _autoSave = true;
-  String _currentLanguage = 'ru';
-  String _currentLanguageName = 'Русский';
+  bool _isDarkMode = true;
 
   @override
   void initState() {
     super.initState();
-    _loadSettings();
+    _loadTheme();
   }
 
-  String _getTranslation(String key) {
-    final translations = AppConstants.translations[_currentLanguage] ?? AppConstants.translations['ru']!;
-    return translations[key] ?? key;
-  }
-
-  Future<void> _loadSettings() async {
+  Future<void> _loadTheme() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      _darkMode = prefs.getBool('darkMode') ?? true;
-      _autoSave = prefs.getBool('autoSave') ?? true;
-      _currentLanguage = prefs.getString('language') ?? 'ru';
-      _currentLanguageName = AppConstants.supportedLanguages.firstWhere(
-        (l) => l['code'] == _currentLanguage,
-        orElse: () => {'code': 'ru', 'name': 'Русский', 'flag': '🇷🇺'},
-      )['name']!;
+      _isDarkMode = prefs.getBool('darkMode') ?? true;
     });
   }
 
-  Future<void> _saveSettings() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('darkMode', _darkMode);
-    await prefs.setBool('autoSave', _autoSave);
-    await prefs.setString('language', _currentLanguage);
-    widget.onThemeChanged(_darkMode);
+  String _getTranslation(String key) {
+    final translations = AppConstants.translations[widget.currentLanguage] ??
+        AppConstants.translations['ru']!;
+    return translations[key] ?? key;
   }
 
-  void _showLanguageDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: AppTheme.cardPurple,
-        title: const Text(
-          'Выберите язык',
-          style: TextStyle(color: AppTheme.accentGold),
+  Future<void> _toggleTheme(bool value) async {
+    setState(() {
+      _isDarkMode = value;
+    });
+    widget.onThemeChanged(value);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('darkMode', value);
+  }
+
+  Future<void> _changeLanguage(String langCode) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('language', langCode);
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${_getTranslation('language_changed')} ${langCode == 'ru' ? 'Русский' : 'English'}'),
         ),
-        content: SizedBox(
-          width: double.maxFinite,
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: AppConstants.supportedLanguages.length,
-            itemBuilder: (context, index) {
-              final lang = AppConstants.supportedLanguages[index];
-              final isSelected = _currentLanguage == lang['code'];
-              return ListTile(
-                leading: Text(lang['flag']!, style: const TextStyle(fontSize: 24)),
-                title: Text(
-                  lang['name']!,
-                  style: TextStyle(
-                    color: isSelected ? AppTheme.accentGold : Colors.white,
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                  ),
-                ),
-                trailing: isSelected
-                    ? const Icon(Icons.check, color: AppTheme.accentGold)
-                    : null,
-                onTap: () {
-                  setState(() {
-                    _currentLanguage = lang['code']!;
-                    _currentLanguageName = lang['name']!;
-                  });
-                  _saveSettings();
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('${_getTranslation('language_changed')} ${lang['name']}'),
-                      duration: const Duration(seconds: 2),
-                    ),
-                  );
-                },
-              );
-            },
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(_getTranslation('close'), style: const TextStyle(color: Colors.grey)),
-          ),
-        ],
-      ),
-    );
+      );
+      Navigator.pushReplacementNamed(context, '/settings');
+    }
+  }
+
+  Future<void> _launchUrl(String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${_getTranslation('error')}: $url')),
+        );
+      }
+    }
   }
 
   @override
@@ -120,215 +82,279 @@ class _SettingsScreenState extends State<SettingsScreen> {
         title: Text(_getTranslation('settings')),
       ),
       body: ListView(
-        padding: const EdgeInsets.all(16),
         children: [
-          _buildSection(_getTranslation('general'), [
-            SwitchListTile(
-              title: Row(
-                children: [
-                  Icon(
-                    _darkMode ? Icons.nightlight_round : Icons.wb_sunny,
-                    color: _darkMode ? AppTheme.accentGold : Colors.orange,
-                    size: 22,
-                  ),
-                  const SizedBox(width: 10),
-                  Text(_darkMode ? _getTranslation('dark_theme') : _getTranslation('light_theme')),
-                ],
-              ),
-              value: _darkMode,
-              onChanged: (value) {
-                setState(() {
-                  _darkMode = value;
-                  _saveSettings();
-                });
-              },
-              activeColor: AppTheme.accentGold,
+          // Общие настройки
+          _buildSectionHeader(_getTranslation('general')),
+          _buildSwitchTile(
+            icon: Icons.dark_mode,
+            title: _getTranslation('dark_theme'),
+            value: _isDarkMode,
+            onChanged: _toggleTheme,
+          ),
+          _buildLanguageTile(),
+
+          // О приложении (НОВЫЙ РАЗДЕЛ С ПОЛНЫМ ТЕКСТОМ)
+          _buildSectionHeader(_getTranslation('about_app')),
+          _buildAboutTile(),
+
+          // Поддержка
+          _buildSectionHeader(_getTranslation('support')),
+          _buildIconTile(
+            icon: Icons.telegram,
+            title: _getTranslation('telegram_channel'),
+            onTap: () => _launchUrl(AppConstants.telegramChannel),
+          ),
+          _buildIconTile(
+            icon: Icons.chat,
+            title: _getTranslation('telegram_chat'),
+            onTap: () => _launchUrl(AppConstants.telegramChat),
+          ),
+          _buildIconTile(
+            icon: Icons.bug_report,
+            title: _getTranslation('report_bug'),
+            onTap: () => _launchUrl('mailto:${AppConstants.supportEmail}'),
+          ),
+
+          // Юридическая информация
+          _buildSectionHeader(_getTranslation('legal')),
+          _buildIconTile(
+            icon: Icons.privacy_tip,
+            title: _getTranslation('privacy_policy'),
+            onTap: () => _showLegalDialog(
+              _getTranslation('privacy_title'),
+              AppConstants.getPrivacyPolicy(widget.currentLanguage),
             ),
-            SwitchListTile(
-              title: Text(_getTranslation('auto_save')),
-              value: _autoSave,
-              onChanged: (value) => setState(() => _autoSave = value),
-              activeColor: AppTheme.accentGold,
+          ),
+          _buildIconTile(
+            icon: Icons.gavel,
+            title: _getTranslation('terms'),
+            onTap: () => _showLegalDialog(
+              _getTranslation('terms_title'),
+              AppConstants.getTerms(widget.currentLanguage),
             ),
-            ListTile(
-              leading: const Icon(Icons.language, color: AppTheme.accentGold),
-              title: Text(_getTranslation('language')),
-              subtitle: Text('$_currentLanguageName'),
-              onTap: _showLanguageDialog,
-            ),
-          ]),
-          _buildSection(_getTranslation('support'), [
-            _buildActionTile(_getTranslation('telegram_channel'), Icons.telegram, () => _launchUrl(AppConstants.telegramChannel)),
-            _buildActionTile(_getTranslation('telegram_chat'), Icons.telegram, () => _launchUrl(AppConstants.telegramChat)),
-            _buildActionTile(_getTranslation('report_bug'), Icons.email, _sendEmail),
-          ]),
-          _buildSection(_getTranslation('legal'), [
-            _buildActionTile(
-              _getTranslation('privacy_policy'),
-              Icons.privacy_tip,
-              () => _showLegal(
-                context,
-                _getTranslation('privacy_policy'),
-                AppConstants.getPrivacyPolicy(_currentLanguage)
-              )
-            ),
-            _buildActionTile(
-              _getTranslation('terms'),
-              Icons.gavel,
-              () => _showLegal(
-                context,
-                _getTranslation('terms'),
-                AppConstants.getTerms(_currentLanguage)
-              )
-            ),
-          ]),
-          _buildSection(_getTranslation('about_app'), [
-            ListTile(
-              title: const Text('Описание'),
-              subtitle: Text(_getTranslation('description')),
-            ),
-            ListTile(
-              title: Text(_getTranslation('system_requirements')),
-              subtitle: Text(_getTranslation('system_requirements_list')),
-            ),
-            const Divider(color: AppTheme.accentGold),
-            ListTile(
-              title: Text(_getTranslation('name')),
-              subtitle: Text(AppConstants.appName),
-            ),
-            ListTile(
-              title: Text(_getTranslation('version')),
-              subtitle: Text(AppConstants.version),
-            ),
-            ListTile(
-              title: Text(_getTranslation('developer')),
-              subtitle: Text(AppConstants.developer),
-            ),
-            ListTile(
-              title: const Text('Авторские права'),
-              subtitle: const Text('© 2026 GOSTOWN Co. All rights reserved.'),
-            ),
-            _buildActionTile(_getTranslation('exit'), Icons.exit_to_app, _exitApp),
-          ]),
+          ),
+
+          // О приложении (инфо)
+          _buildSectionHeader(''),
+          _buildInfoTile(),
         ],
       ),
     );
   }
 
-  void _exitApp() {
-    Navigator.of(context).popUntil((route) => route.isFirst);
-  }
-
-  Widget _buildSection(String title, List<Widget> children) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          child: Text(
-            title,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: AppTheme.accentGold,
-            ),
-          ),
+  Widget _buildSectionHeader(String title) {
+    if (title.isEmpty) return const SizedBox(height: 8);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+      child: Text(
+        title,
+        style: TextStyle(
+          color: AppTheme.accentGold,
+          fontSize: 14,
+          fontWeight: FontWeight.bold,
         ),
-        ...children,
-        const Divider(color: AppTheme.accentGold),
-      ],
+      ),
     );
   }
 
-  Widget _buildActionTile(String title, IconData icon, VoidCallback onTap) {
+  Widget _buildSwitchTile({
+    required IconData icon,
+    required String title,
+    required bool value,
+    required ValueChanged<bool> onChanged,
+  }) {
+    return SwitchListTile(
+      secondary: Icon(icon, color: AppTheme.accentGold),
+      title: Text(title),
+      value: value,
+      onChanged: onChanged,
+    );
+  }
+
+  Widget _buildLanguageTile() {
+    return ListTile(
+      leading: const Icon(Icons.language, color: AppTheme.accentGold),
+      title: Text(_getTranslation('language')),
+      subtitle: Text(
+        widget.currentLanguage == 'ru' ? 'Русский' : 'English',
+      ),
+      trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+      onTap: () => _showLanguageDialog(),
+    );
+  }
+
+  Widget _buildIconTile({
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+  }) {
     return ListTile(
       leading: Icon(icon, color: AppTheme.accentGold),
       title: Text(title),
+      trailing: const Icon(Icons.arrow_forward_ios, size: 16),
       onTap: onTap,
     );
   }
 
-  Future<void> _launchUrl(String url) async {
-    final uri = Uri.parse(url);
-    if (!await launchUrl(uri)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(_getTranslation('error'))),
-      );
-    }
-  }
-
-  Future<void> _sendEmail() async {
-    final uri = Uri(
-      scheme: 'mailto',
-      path: AppConstants.supportEmail,
-      query: 'subject=Сообщение об ошибке Vorxy Code Editor',
-    );
-    if (!await launchUrl(uri)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(_getTranslation('error'))),
-      );
-    }
-  }
-
-  void _showLegal(BuildContext context, String title, String text) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: AppTheme.primaryPurple,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+  // НОВЫЙ TILE ДЛЯ "О ПРИЛОЖЕНИИ" С ПОЛНЫМ ТЕКСТОМ
+  Widget _buildAboutTile() {
+    return ListTile(
+      leading: const Icon(Icons.info_outline, color: AppTheme.accentGold),
+      title: Text(_getTranslation('about_app')),
+      subtitle: Text(
+        '${AppConstants.appName} v${AppConstants.version}',
+        style: const TextStyle(fontSize: 12, color: Colors.grey),
       ),
-      builder: (context) => DraggableScrollableSheet(
-        initialChildSize: 0.75,
-        minChildSize: 0.5,
-        maxChildSize: 0.9,
-        expand: false,
-        builder: (context, scrollController) => Padding(
-          padding: const EdgeInsets.all(16),
+      trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+      onTap: () => _showAboutDialog(),
+    );
+  }
+
+  Widget _buildInfoTile() {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '${_getTranslation('name')}: ${AppConstants.appName}',
+            style: const TextStyle(fontSize: 14),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            '${_getTranslation('version')}: ${AppConstants.version}',
+            style: const TextStyle(fontSize: 14),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            '${_getTranslation('developer')}: ${AppConstants.developer}',
+            style: const TextStyle(fontSize: 14),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            '${_getTranslation('system_requirements')}: ${_getTranslation('system_requirements_list')}',
+            style: const TextStyle(fontSize: 14),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showLanguageDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(_getTranslation('select_language')),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Text('🇷🇺'),
+              title: const Text('Русский'),
+              onTap: () {
+                Navigator.pop(context);
+                _changeLanguage('ru');
+              },
+            ),
+            ListTile(
+              leading: const Text('🇬🇧'),
+              title: const Text('English'),
+              onTap: () {
+                Navigator.pop(context);
+                _changeLanguage('en');
+              },
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(_getTranslation('close')),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showLegalDialog(String title, String content) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(title),
+        content: SingleChildScrollView(
+          child: Text(
+            content,
+            style: const TextStyle(fontSize: 14, height: 1.5),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(_getTranslation('close')),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // НОВЫЙ ДИАЛОГ "О ПРИЛОЖЕНИИ" С ПОЛНЫМ ТЕКСТОМ ИЗ README
+  void _showAboutDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            const Icon(Icons.info, color: AppTheme.accentGold),
+            const SizedBox(width: 8),
+            Text(_getTranslation('about_app')),
+          ],
+        ),
+        content: SingleChildScrollView(
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: AppTheme.accentGold,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-              const SizedBox(height: 16),
               Text(
-                title,
+                '${AppConstants.appName} v${AppConstants.version}',
                 style: const TextStyle(
-                  fontSize: 20,
+                  fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: AppTheme.accentGold,
                 ),
               ),
-              const SizedBox(height: 16),
-              Expanded(
-                child: SingleChildScrollView(
-                  controller: scrollController,
-                  child: Text(
-                    text,
-                    style: const TextStyle(
-                      color: AppTheme.textLight,
-                      fontSize: 14,
-                      height: 1.6,
-                    ),
-                  ),
-                ),
+              const SizedBox(height: 12),
+              Text(
+                _getTranslation('about_full_text'),
+                style: const TextStyle(fontSize: 14, height: 1.6),
               ),
               const SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text(_getTranslation('close')),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.grey.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '📱 ${_getTranslation('system_requirements')}',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(_getTranslation('system_requirements_list')),
+                  ],
                 ),
               ),
             ],
           ),
         ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(_getTranslation('close')),
+          ),
+        ],
       ),
     );
   }
