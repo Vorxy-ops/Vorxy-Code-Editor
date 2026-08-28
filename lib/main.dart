@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'screens/home_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/editor_screen.dart';
@@ -10,19 +11,48 @@ void main() {
   runApp(const VorxyCodeEditor());
 }
 
-class VorxyCodeEditor extends StatelessWidget {
+class VorxyCodeEditor extends StatefulWidget {
   const VorxyCodeEditor({super.key});
+
+  @override
+  State<VorxyCodeEditor> createState() => _VorxyCodeEditorState();
+}
+
+class _VorxyCodeEditorState extends State<VorxyCodeEditor> {
+  bool _isDarkMode = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadTheme();
+  }
+
+  Future<void> _loadTheme() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _isDarkMode = prefs.getBool('darkMode') ?? true;
+    });
+  }
+
+  void _toggleTheme(bool isDark) {
+    setState(() {
+      _isDarkMode = isDark;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Vorxy Code Editor',
-      theme: AppTheme.darkTheme,
-      home: const SplashScreen(),
+      theme: _isDarkMode ? AppTheme.darkTheme : AppTheme.lightTheme,
+      home: SplashScreen(onThemeChanged: _toggleTheme),
       debugShowCheckedModeBanner: false,
       routes: {
-        '/home': (context) => const HomeScreen(),
-        '/settings': (context) => const SettingsScreen(currentLanguage: 'ru'),
+        '/home': (context) => HomeScreen(onThemeChanged: _toggleTheme),
+        '/settings': (context) => SettingsScreen(
+              currentLanguage: 'ru',
+              onThemeChanged: _toggleTheme,
+            ),
         '/editor': (context) => const EditorScreen(currentLanguage: 'ru'),
         '/files': (context) => const FilesScreen(currentLanguage: 'ru'),
         '/languages': (context) => const LanguagesScreen(currentLanguage: 'ru'),
@@ -32,7 +62,9 @@ class VorxyCodeEditor extends StatelessWidget {
 }
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
+  final Function(bool) onThemeChanged;
+
+  const SplashScreen({super.key, required this.onThemeChanged});
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
