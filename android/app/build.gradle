@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace 'com.vorxy.code_editor'
-    compileSdk 35
+    compileSdk 36
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
@@ -20,7 +20,7 @@ android {
     defaultConfig {
         applicationId "com.vorxy.code_editor"
         minSdk 24
-        targetSdk 35
+        targetSdk 36
         versionCode 3
         versionName "3.2.0"
         multiDexEnabled true
