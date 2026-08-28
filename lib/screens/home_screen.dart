@@ -8,7 +8,9 @@ import '../utils/theme.dart';
 import '../utils/constants.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final Function(bool) onThemeChanged;
+
+  const HomeScreen({super.key, required this.onThemeChanged});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -33,7 +35,10 @@ class _HomeScreenState extends State<HomeScreen> {
         LanguagesScreen(currentLanguage: _currentLanguage),
         EditorScreen(currentLanguage: _currentLanguage),
         FilesScreen(currentLanguage: _currentLanguage),
-        SettingsScreen(currentLanguage: _currentLanguage),
+        SettingsScreen(
+          currentLanguage: _currentLanguage,
+          onThemeChanged: widget.onThemeChanged,
+        ),
       ];
     });
   }
