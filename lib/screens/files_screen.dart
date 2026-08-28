@@ -42,51 +42,6 @@ class _FilesScreenState extends State<FilesScreen> {
     }
   }
 
-  Future<void> _createFile() async {
-    final controller = TextEditingController();
-    final fileName = await showDialog<String>(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: AppTheme.cardPurple,
-        title: const Text('Новый файл', style: TextStyle(color: AppTheme.accentGold)),
-        content: TextField(
-          controller: controller,
-          style: const TextStyle(color: Colors.white),
-          decoration: const InputDecoration(
-            hintText: 'main.dart',
-            hintStyle: TextStyle(color: Colors.grey),
-            border: OutlineInputBorder(),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Отмена', style: TextStyle(color: Colors.grey)),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, controller.text),
-            child: const Text('Создать'),
-          ),
-        ],
-      ),
-    );
-    if (fileName != null && fileName.isNotEmpty) {
-      try {
-        final dir = await getApplicationDocumentsDirectory();
-        final file = File('${dir.path}/$fileName');
-        await file.create();
-        await _loadFiles();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Файл $fileName создан')),
-        );
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Ошибка: $e')),
-        );
-      }
-    }
-  }
-
   Future<void> _deleteFile(File file) async {
     final confirm = await showDialog<bool>(
       context: context,
@@ -171,16 +126,6 @@ class _FilesScreenState extends State<FilesScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(_getTranslation('files')),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.note_add, color: AppTheme.accentGold),
-            onPressed: _createFile,
-          ),
-          IconButton(
-            icon: const Icon(Icons.refresh, color: AppTheme.accentGold),
-            onPressed: _loadFiles,
-          ),
-        ],
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
