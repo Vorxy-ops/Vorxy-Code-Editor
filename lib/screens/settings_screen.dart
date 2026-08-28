@@ -83,7 +83,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
       body: ListView(
         children: [
-          // Общие настройки
           _buildSectionHeader(_getTranslation('general')),
           _buildSwitchTile(
             icon: Icons.dark_mode,
@@ -92,12 +91,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onChanged: _toggleTheme,
           ),
           _buildLanguageTile(),
-
-          // О приложении (НОВЫЙ РАЗДЕЛ С ПОЛНЫМ ТЕКСТОМ)
           _buildSectionHeader(_getTranslation('about_app')),
           _buildAboutTile(),
-
-          // Поддержка
           _buildSectionHeader(_getTranslation('support')),
           _buildIconTile(
             icon: Icons.telegram,
@@ -114,8 +109,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
             title: _getTranslation('report_bug'),
             onTap: () => _launchUrl('mailto:${AppConstants.supportEmail}'),
           ),
-
-          // Юридическая информация
           _buildSectionHeader(_getTranslation('legal')),
           _buildIconTile(
             icon: Icons.privacy_tip,
@@ -133,8 +126,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               AppConstants.getTerms(widget.currentLanguage),
             ),
           ),
-
-          // О приложении (инфо)
           _buildSectionHeader(''),
           _buildInfoTile(),
         ],
@@ -196,7 +187,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  // НОВЫЙ TILE ДЛЯ "О ПРИЛОЖЕНИИ" С ПОЛНЫМ ТЕКСТОМ
   Widget _buildAboutTile() {
     return ListTile(
       leading: const Icon(Icons.info_outline, color: AppTheme.accentGold),
@@ -297,7 +287,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  // НОВЫЙ ДИАЛОГ "О ПРИЛОЖЕНИИ" С ПОЛНЫМ ТЕКСТОМ ИЗ README
   void _showAboutDialog() {
     showDialog(
       context: context,
