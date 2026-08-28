@@ -6,14 +6,20 @@ import '../utils/theme.dart';
 
 class SettingsScreen extends StatefulWidget {
   final String currentLanguage;
+  final Function(bool) onThemeChanged;
 
-  const SettingsScreen({super.key, required this.currentLanguage});
+  const SettingsScreen({
+    super.key,
+    required this.currentLanguage,
+    required this.onThemeChanged,
+  });
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
+  bool _darkMode = true;
   double _fontSize = 16;
   int _tabSize = 4;
   bool _autoSave = true;
@@ -34,6 +40,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
+      _darkMode = prefs.getBool('darkMode') ?? true;
       _fontSize = prefs.getDouble('fontSize') ?? 16;
       _tabSize = prefs.getInt('tabSize') ?? 4;
       _autoSave = prefs.getBool('autoSave') ?? true;
@@ -47,10 +54,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _saveSettings() async {
     final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('darkMode', _darkMode);
     await prefs.setDouble('fontSize', _fontSize);
     await prefs.setInt('tabSize', _tabSize);
     await prefs.setBool('autoSave', _autoSave);
     await prefs.setString('language', _currentLanguage);
+    widget.onThemeChanged(_darkMode);
   }
 
   void _showLanguageDialog() {
@@ -120,6 +129,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
         padding: const EdgeInsets.all(16),
         children: [
           _buildSection(_getTranslation('general'), [
+            SwitchListTile(
+              title: Row(
+                children: [
+                  Icon(
+                    _darkMode ? Icons.nightlight_round : Icons.wb_sunny,
+                    color: _darkMode ? AppTheme.accentGold : Colors.orange,
+                    size: 22,
+                  ),
+                  const SizedBox(width: 10),
+                  Text(_darkMode ? _getTranslation('dark_theme') : _getTranslation('light_theme')),
+                ],
+              ),
+              value: _darkMode,
+              onChanged: (value) {
+                setState(() {
+                  _darkMode = value;
+                  _saveSettings();
+                });
+              },
+              activeColor: AppTheme.accentGold,
+            ),
             SwitchListTile(
               title: Text(_getTranslation('auto_save')),
               value: _autoSave,
@@ -284,7 +314,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: AppTheme.primaryPurple,
+      backgroundColor: AppTheme.cardPurple,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
