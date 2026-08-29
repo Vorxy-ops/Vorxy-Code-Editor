@@ -68,14 +68,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
-  Future<void> _launchUrl(String url) async {
+  Future<void> _openLink(String url) async {
     try {
-      final uri = Uri.parse(url);
+      final Uri uri = Uri.parse(url);
       if (await canLaunchUrl(uri)) {
-        await launchUrl(
-          uri,
-          mode: LaunchMode.platformDefault,
-        );
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -98,18 +95,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
-  Future<void> _sendEmail() async {
+  Future<void> _openEmail() async {
     try {
-      final email = Uri(
+      final Uri emailUri = Uri(
         scheme: 'mailto',
         path: AppConstants.supportEmail,
         query: 'subject=${Uri.encodeComponent(_getTranslation('bug_report_subject'))}&body=${Uri.encodeComponent(_getTranslation('bug_report_body'))}',
       );
-      if (await canLaunchUrl(email)) {
-        await launchUrl(
-          email,
-          mode: LaunchMode.platformDefault,
-        );
+      if (await canLaunchUrl(emailUri)) {
+        await launchUrl(emailUri, mode: LaunchMode.externalApplication);
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -172,27 +166,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _buildIconTile(
             icon: Icons.telegram,
             title: _getTranslation('telegram_channel'),
-            onTap: () => _launchUrl(AppConstants.telegramChannel),
+            onTap: () => _openLink(AppConstants.telegramChannel),
           ),
           _buildIconTile(
             icon: Icons.chat,
             title: _getTranslation('telegram_chat'),
-            onTap: () => _launchUrl(AppConstants.telegramChat),
+            onTap: () => _openLink(AppConstants.telegramChat),
           ),
           _buildIconTile(
             icon: Icons.code,
             title: _getTranslation('github'),
-            onTap: () => _launchUrl(AppConstants.githubRepo),
+            onTap: () => _openLink(AppConstants.githubRepo),
           ),
           _buildSectionHeader(_getTranslation('support')),
           _buildIconTile(
             icon: Icons.email,
             title: _getTranslation('email'),
-            onTap: _sendEmail,
+            onTap: _openEmail,
           ),
           _buildSectionHeader(_getTranslation('legal')),
           _buildIconTile(
-            icon: Icons.gavel,
+            icon: Icons.description,
             title: _getTranslation('terms'),
             onTap: () => _showLegalDialog(
               _getTranslation('terms_title'),
