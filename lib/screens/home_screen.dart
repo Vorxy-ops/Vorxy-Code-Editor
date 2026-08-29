@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'settings_screen.dart';
 import 'editor_screen.dart';
 import 'files_screen.dart';
@@ -27,7 +26,6 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
   late String _currentLanguage;
-  bool _permissionRequested = false;
 
   @override
   void initState() {
@@ -42,26 +40,6 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         _currentLanguage = widget.currentLanguage;
       });
-    }
-  }
-
-  void _onTabChanged(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-    if (index == 0 && !_permissionRequested) {
-      _requestPermission();
-    }
-  }
-
-  Future<void> _requestPermission() async {
-    final status = await Permission.manageExternalStorage.request();
-    if (status.isGranted) {
-      setState(() {
-        _permissionRequested = true;
-      });
-    } else {
-      _requestPermission();
     }
   }
 
@@ -87,7 +65,7 @@ class _HomeScreenState extends State<HomeScreen> {
       body: pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
-        onTap: _onTabChanged,
+        onTap: (index) => setState(() => _selectedIndex = index),
         items: [
           BottomNavigationBarItem(icon: const Icon(Icons.code), label: _getTranslation('languages')),
           BottomNavigationBarItem(icon: const Icon(Icons.edit), label: _getTranslation('editor')),
