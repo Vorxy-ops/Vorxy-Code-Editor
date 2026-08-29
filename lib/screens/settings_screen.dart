@@ -185,19 +185,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           _buildSectionHeader(_getTranslation('legal')),
           _buildIconTile(
-            icon: Icons.gavel,
-            title: _getTranslation('terms'),
-            onTap: () => _showLegalDialog(
-              _getTranslation('terms_title'),
-              AppConstants.getTerms(_currentLanguage),
-            ),
-          ),
-          _buildIconTile(
             icon: Icons.privacy_tip,
             title: _getTranslation('privacy_policy'),
             onTap: () => _showLegalDialog(
               _getTranslation('privacy_title'),
               AppConstants.getPrivacyPolicy(_currentLanguage),
+            ),
+          ),
+          _buildIconTile(
+            icon: Icons.gavel,
+            title: _getTranslation('terms'),
+            onTap: () => _showLegalDialog(
+              _getTranslation('terms_title'),
+              AppConstants.getTerms(_currentLanguage),
             ),
           ),
           _buildIconTile(
@@ -400,10 +400,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
               const SizedBox(height: 8),
-              _buildContactItem(Icons.telegram, 'Telegram', AppConstants.telegramChannel),
-              _buildContactItem(Icons.chat, 'Telegram Chat', AppConstants.telegramChat),
-              _buildContactItem(Icons.code, 'GitHub', AppConstants.githubRepo),
-              _buildContactItem(Icons.email, 'Email', AppConstants.supportEmail),
+              _buildContactItem(Icons.telegram, _getTranslation('telegram_channel'), AppConstants.telegramChannel),
+              _buildContactItem(Icons.chat, _getTranslation('telegram_chat'), AppConstants.telegramChat),
+              _buildContactItem(Icons.code, _getTranslation('github'), AppConstants.githubRepo),
+              _buildContactItem(Icons.email, _getTranslation('email'), AppConstants.supportEmail),
             ],
           ),
         ),
