@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:permission_handler/permission_handler.dart';
 import '../widgets/code_editor_widget.dart';
 import '../utils/theme.dart';
 import '../utils/constants.dart';
@@ -21,22 +20,11 @@ class _EditorScreenState extends State<EditorScreen> {
   String _code = '';
   String _language = 'Python';
   String _fileName = 'main';
-  bool _hasPermission = false;
 
   @override
   void initState() {
     super.initState();
-    _requestPermission();
-  }
-
-  Future<void> _requestPermission() async {
-    final status = await Permission.manageExternalStorage.request();
-    setState(() {
-      _hasPermission = status.isGranted;
-    });
-    if (_hasPermission) {
-      _loadLastFile();
-    }
+    _loadLastFile();
   }
 
   String _getExtension(String language) {
@@ -145,16 +133,6 @@ class _EditorScreenState extends State<EditorScreen> {
   }
 
   Future<void> _saveFile() async {
-    if (!_hasPermission) {
-      await _requestPermission();
-      if (!_hasPermission) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${_getTranslation('error')}: ${_getTranslation('permission_denied')}')),
-        );
-        return;
-      }
-    }
-
     try {
       String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
       if (selectedDirectory == null) return;
@@ -188,6 +166,14 @@ class _EditorScreenState extends State<EditorScreen> {
 
       final fileName = result + _getExtension(_language);
       final filePath = '$selectedDirectory/$fileName';
+
+      if (await File(filePath).exists()) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(_getTranslation('file_exists'))),
+        );
+        return;
+      }
+
       final file = File(filePath);
       await file.writeAsString(_code);
 
@@ -209,38 +195,13 @@ class _EditorScreenState extends State<EditorScreen> {
   }
 
   String _getTranslation(String key) {
-    final translations = AppConstants.translations[widget.currentLanguage] ?? AppConstants.translations['ru']!;
+    final translations = AppConstants.translations[widget.currentLanguage] ??
+        AppConstants.translations['ru']!;
     return translations[key] ?? key;
   }
 
   @override
   Widget build(BuildContext context) {
-    if (!_hasPermission) {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text(_getTranslation('editor')),
-        ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.folder_open, size: 64, color: Colors.grey),
-              const SizedBox(height: 16),
-              Text(
-                _getTranslation('permission_required'),
-                style: const TextStyle(fontSize: 16),
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: _requestPermission,
-                child: Text(_getTranslation('grant_permission')),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
     return Scaffold(
       appBar: AppBar(
         title: Text(_getTranslation('editor')),
@@ -267,6 +228,7 @@ class _EditorScreenState extends State<EditorScreen> {
                   dropdownColor: AppTheme.cardPurple,
                   style: const TextStyle(color: AppTheme.accentGold),
                   underline: Container(height: 1, color: AppTheme.accentGold),
+                  icon: const Icon(Icons.arrow_drop_down, color: AppTheme.accentGold),
                   items: const [
                     DropdownMenuItem(value: 'Python', child: Text('Python')),
                     DropdownMenuItem(value: 'JavaScript', child: Text('JavaScript')),
@@ -290,23 +252,25 @@ class _EditorScreenState extends State<EditorScreen> {
                   },
                 ),
                 const Spacer(),
-                Text(
-                  '${_code.split('\n').length} ${_getTranslation('line')}',
-                  style: const TextStyle(color: Colors.grey, fontSize: 12),
-                ),
               ],
             ),
             const SizedBox(height: 8),
             Expanded(
-              child: CodeEditorWidget(
-                code: _code,
-                language: _language,
-                currentLanguage: widget.currentLanguage,
-                onCodeChanged: (newCode) {
-                  setState(() {
-                    _code = newCode;
-                  });
-                },
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    CodeEditorWidget(
+                      code: _code,
+                      language: _language,
+                      currentLanguage: widget.currentLanguage,
+                      onCodeChanged: (newCode) {
+                        setState(() {
+                          _code = newCode;
+                        });
+                      },
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
