@@ -22,19 +22,31 @@ class VorxyCodeEditor extends StatefulWidget {
 class _VorxyCodeEditorState extends State<VorxyCodeEditor> {
   bool _isDarkMode = true;
   String _currentLanguage = 'ru';
+  bool _isReady = false;
+  bool _permissionGranted = false;
 
   @override
   void initState() {
     super.initState();
-    _loadSettings();
+    _initializeApp();
   }
 
-  Future<void> _loadSettings() async {
+  Future<void> _initializeApp() async {
     final prefs = await SharedPreferences.getInstance();
+    _isDarkMode = prefs.getBool('darkMode') ?? true;
+    _currentLanguage = prefs.getString('language') ?? 'ru';
+    await _requestPermission();
     setState(() {
-      _isDarkMode = prefs.getBool('darkMode') ?? true;
-      _currentLanguage = prefs.getString('language') ?? 'ru';
+      _isReady = true;
     });
+  }
+
+  Future<void> _requestPermission() async {
+    final status = await Permission.manageExternalStorage.request();
+    _permissionGranted = status.isGranted;
+    if (!_permissionGranted) {
+      await _requestPermission();
+    }
   }
 
   void _toggleTheme(bool isDark) {
@@ -54,11 +66,20 @@ class _VorxyCodeEditorState extends State<VorxyCodeEditor> {
     return MaterialApp(
       title: 'Vorxy Code Editor',
       theme: _isDarkMode ? AppTheme.darkTheme : AppTheme.lightTheme,
-      home: SplashScreen(
-        onThemeChanged: _toggleTheme,
-        onLanguageChanged: _changeLanguage,
-        currentLanguage: _currentLanguage,
-      ),
+      home: _isReady
+          ? SplashScreen(
+              onThemeChanged: _toggleTheme,
+              onLanguageChanged: _changeLanguage,
+              currentLanguage: _currentLanguage,
+            )
+          : Scaffold(
+              backgroundColor: const Color(0xFF1A0B2E),
+              body: const Center(
+                child: CircularProgressIndicator(
+                  color: Color(0xFFFFEB3B),
+                ),
+              ),
+            ),
       debugShowCheckedModeBanner: false,
       routes: {
         '/home': (context) => HomeScreen(
@@ -109,7 +130,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _navigateToHome() async {
-    await Future.delayed(const Duration(milliseconds: 200));
+    await Future.delayed(const Duration(milliseconds: 1500));
     if (mounted) {
       Navigator.pushReplacementNamed(context, '/home');
     }
