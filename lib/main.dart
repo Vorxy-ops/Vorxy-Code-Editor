@@ -25,22 +25,14 @@ class _VorxyCodeEditorState extends State<VorxyCodeEditor> {
   @override
   void initState() {
     super.initState();
-    _loadThemeAndPermission();
+    _loadTheme();
   }
 
-  Future<void> _loadThemeAndPermission() async {
+  Future<void> _loadTheme() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       _isDarkMode = prefs.getBool('darkMode') ?? true;
     });
-    _requestPermissions();
-  }
-
-  Future<void> _requestPermissions() async {
-    final status = await Permission.manageExternalStorage.request();
-    if (!status.isGranted) {
-      await _requestPermissions();
-    }
   }
 
   void _toggleTheme(bool isDark) {
@@ -83,26 +75,13 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    _checkPermissionsAndNavigate();
+    _navigateToHome();
   }
 
-  Future<void> _checkPermissionsAndNavigate() async {
-    final status = await Permission.manageExternalStorage.status;
-    if (status.isGranted) {
-      await Future.delayed(const Duration(milliseconds: 200));
-      if (mounted) {
-        Navigator.pushReplacementNamed(context, '/home');
-      }
-    } else {
-      final newStatus = await Permission.manageExternalStorage.request();
-      if (newStatus.isGranted) {
-        await Future.delayed(const Duration(milliseconds: 200));
-        if (mounted) {
-          Navigator.pushReplacementNamed(context, '/home');
-        }
-      } else {
-        _checkPermissionsAndNavigate();
-      }
+  Future<void> _navigateToHome() async {
+    await Future.delayed(const Duration(milliseconds: 200));
+    if (mounted) {
+      Navigator.pushReplacementNamed(context, '/home');
     }
   }
 
