@@ -29,6 +29,7 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
   bool _isProcessing = false;
   ScrollController _scrollController = ScrollController();
   ScrollController _lineScrollController = ScrollController();
+  int _cursorPosition = 0;
 
   String _getTranslation(String key) {
     final translations = AppConstants.translations[widget.currentLanguage] ?? AppConstants.translations['ru']!;
@@ -46,6 +47,12 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
         _lineScrollController.jumpTo(_scrollController.offset);
       }
     });
+
+    _controller.addListener(() {
+      setState(() {
+        _cursorPosition = _controller.selection.baseOffset;
+      });
+    });
   }
 
   @override
@@ -54,6 +61,7 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
     if (oldWidget.code != widget.code) {
       _controller.text = widget.code;
       _displayCode = widget.code;
+      _cursorPosition = _controller.selection.baseOffset;
     }
   }
 
@@ -63,6 +71,7 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
     
     setState(() {
       _displayCode = value;
+      _cursorPosition = _controller.selection.baseOffset;
     });
     
     widget.onCodeChanged(value);
@@ -77,10 +86,30 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
     return text.split('\n');
   }
 
+  String _getLineAndColumn(String text, int position) {
+    if (position < 0) position = 0;
+    if (position > text.length) position = text.length;
+    
+    final String beforeCursor = text.substring(0, position);
+    final int line = beforeCursor.split('\n').length;
+    final int lastNewLine = beforeCursor.lastIndexOf('\n');
+    final int column = lastNewLine == -1 ? beforeCursor.length + 1 : beforeCursor.length - lastNewLine;
+    
+    return 'Ln $line, Col $column';
+  }
+
+  String _getStats(String text) {
+    final lines = text.split('\n').length;
+    final chars = text.replaceAll(' ', '').replaceAll('\n', '').length;
+    return '$lines ${_getTranslation('line')}, $chars ${_getTranslation('chars')}';
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final lines = _getLines(_displayCode);
+    final lineAndCol = _getLineAndColumn(_displayCode, _cursorPosition);
+    final stats = _getStats(_displayCode);
     
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -98,10 +127,27 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
             ),
             const Spacer(),
             Text(
-              '${lines.length} ${_getTranslation('line')}',
+              lineAndCol,
               style: const TextStyle(
                 color: Colors.grey,
                 fontSize: 12,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 4),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Flexible(
+              child: Text(
+                stats,
+                style: TextStyle(
+                  color: Colors.grey.shade600,
+                  fontSize: _getFontSize(stats),
+                ),
+                overflow: TextOverflow.visible,
+                softWrap: false,
               ),
             ),
           ],
@@ -118,7 +164,7 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
             children: [
               // Номера строк
               Container(
-                width: 40,
+                width: _getLineNumberWidth(lines.length),
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
                   color: isDark ? Colors.grey.shade900 : Colors.grey.shade200,
@@ -140,7 +186,7 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
                       child: Text(
                         '${index + 1}',
                         style: TextStyle(
-                          fontSize: 13,
+                          fontSize: _getNumberFontSize(lines.length),
                           fontFamily: 'monospace',
                           color: isDark ? Colors.grey.shade600 : Colors.grey.shade700,
                         ),
@@ -174,6 +220,7 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
         Expanded(
           child: TextField(
             controller: _controller,
+            focusNode: _focusNode,
             maxLines: null,
             minLines: 10,
             expands: true,
@@ -207,10 +254,39 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
               fillColor: isDark ? Colors.black : Colors.white,
             ),
             onChanged: _onCodeChanged,
+            onTap: () {
+              setState(() {
+                _cursorPosition = _controller.selection.baseOffset;
+              });
+            },
           ),
         ),
       ],
     );
+  }
+
+  double _getFontSize(String text) {
+    final length = text.length;
+    if (length <= 15) return 12;
+    if (length <= 25) return 11;
+    if (length <= 35) return 10;
+    if (length <= 50) return 9;
+    return 8;
+  }
+
+  double _getNumberFontSize(int count) {
+    if (count <= 99) return 13;
+    if (count <= 999) return 12;
+    if (count <= 9999) return 11;
+    return 10;
+  }
+
+  double _getLineNumberWidth(int count) {
+    if (count <= 9) return 30;
+    if (count <= 99) return 35;
+    if (count <= 999) return 40;
+    if (count <= 9999) return 45;
+    return 50;
   }
 
   Map<String, TextStyle> _getDarkTheme() {
