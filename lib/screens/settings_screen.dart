@@ -161,8 +161,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    
     return Scaffold(
       appBar: AppBar(
         title: Text(_getTranslation('settings')),
@@ -170,31 +168,52 @@ class _SettingsScreenState extends State<SettingsScreen> {
       body: ListView(
         children: [
           _buildSectionHeader(_getTranslation('general')),
-          _buildThemeToggle(),
+          _buildSwitchTile(
+            icon: Icons.dark_mode,
+            title: _getTranslation('dark_theme'),
+            value: _isDarkMode,
+            onChanged: _toggleTheme,
+          ),
           _buildLanguageTile(),
           _buildSectionHeader(_getTranslation('about_app')),
           _buildAboutTile(),
+          _buildSectionHeader(_getTranslation('contacts')),
+          _buildIconTile(
+            icon: Icons.telegram,
+            title: _getTranslation('telegram_channel'),
+            onTap: () => _launchUrl(AppConstants.telegramChannel),
+          ),
+          _buildIconTile(
+            icon: Icons.chat,
+            title: _getTranslation('telegram_chat'),
+            onTap: () => _launchUrl(AppConstants.telegramChat),
+          ),
+          _buildIconTile(
+            icon: Icons.code,
+            title: _getTranslation('github'),
+            onTap: () => _launchUrl(AppConstants.githubRepo),
+          ),
           _buildSectionHeader(_getTranslation('support')),
           _buildIconTile(
-            icon: Icons.bug_report,
-            title: _getTranslation('report_bug'),
+            icon: Icons.email,
+            title: _getTranslation('email'),
             onTap: _sendEmail,
           ),
           _buildSectionHeader(_getTranslation('legal')),
-          _buildIconTile(
-            icon: Icons.gavel,
-            title: _getTranslation('terms'),
-            onTap: () => _showLegalDialog(
-              _getTranslation('terms_title'),
-              AppConstants.getTerms(_currentLanguage),
-            ),
-          ),
           _buildIconTile(
             icon: Icons.privacy_tip,
             title: _getTranslation('privacy_policy'),
             onTap: () => _showLegalDialog(
               _getTranslation('privacy_title'),
               AppConstants.getPrivacyPolicy(_currentLanguage),
+            ),
+          ),
+          _buildIconTile(
+            icon: Icons.gavel,
+            title: _getTranslation('terms'),
+            onTap: () => _showLegalDialog(
+              _getTranslation('terms_title'),
+              AppConstants.getTerms(_currentLanguage),
             ),
           ),
           _buildIconTile(
@@ -224,51 +243,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _buildThemeToggle() {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Row(
-        children: [
-          Text(
-            _getTranslation('theme'),
-            style: const TextStyle(fontSize: 16),
-          ),
-          const Spacer(),
-          InkWell(
-            onTap: () => _toggleTheme(true),
-            borderRadius: BorderRadius.circular(20),
-            child: Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: isDark ? AppTheme.accentGold : Colors.grey.shade300,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Icon(
-                Icons.nightlight_round,
-                color: isDark ? AppTheme.primaryPurple : Colors.grey.shade600,
-              ),
-            ),
-          ),
-          const SizedBox(width: 8),
-          InkWell(
-            onTap: () => _toggleTheme(false),
-            borderRadius: BorderRadius.circular(20),
-            child: Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: !isDark ? AppTheme.accentGold : Colors.grey.shade300,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Icon(
-                Icons.wb_sunny,
-                color: !isDark ? AppTheme.primaryPurple : Colors.grey.shade600,
-              ),
-            ),
-          ),
-        ],
-      ),
+  Widget _buildSwitchTile({
+    required IconData icon,
+    required String title,
+    required bool value,
+    required ValueChanged<bool> onChanged,
+  }) {
+    return SwitchListTile(
+      secondary: Icon(icon, color: AppTheme.accentGold),
+      title: Text(title),
+      value: value,
+      onChanged: onChanged,
     );
   }
 
@@ -277,11 +262,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       leading: const Icon(Icons.language, color: AppTheme.accentGold),
       title: Text(_getTranslation('language')),
       subtitle: Text(
-        _currentLanguage == 'ru' ? 'RUS' : 'ENG',
-        style: TextStyle(
-          color: AppTheme.accentGold,
-          fontWeight: FontWeight.bold,
-        ),
+        _currentLanguage == 'ru' ? 'Русский' : 'English',
       ),
       trailing: const Icon(Icons.arrow_forward_ios, size: 16),
       onTap: () => _showLanguageDialog(),
@@ -348,26 +329,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              title: Text(
-                'RUS',
-                style: TextStyle(
-                  color: AppTheme.accentGold,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              leading: const Text('🇷🇺'),
+              title: const Text('Русский'),
               onTap: () {
                 Navigator.pop(context);
                 _changeLanguage('ru');
               },
             ),
             ListTile(
-              title: Text(
-                'ENG',
-                style: TextStyle(
-                  color: AppTheme.accentGold,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              leading: const Text('🇬🇧'),
+              title: const Text('English'),
               onTap: () {
                 Navigator.pop(context);
                 _changeLanguage('en');
@@ -407,8 +378,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _showAboutDialog() {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -426,42 +395,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
             children: [
               Text(
                 '${AppConstants.appName} v${AppConstants.version}',
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: isDark ? AppTheme.accentGold : AppTheme.primaryPurple,
+                  color: AppTheme.accentGold,
                 ),
               ),
               const SizedBox(height: 12),
               Text(
                 _getTranslation('about_full_text'),
                 style: const TextStyle(fontSize: 14, height: 1.6),
-              ),
-              const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: isDark ? Colors.grey.shade800 : Colors.grey.shade200,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      _getTranslation('contacts'),
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: isDark ? AppTheme.accentGold : AppTheme.primaryPurple,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    _buildContactItem(Icons.telegram, _getTranslation('telegram_channel'), AppConstants.telegramChannel, isDark),
-                    _buildContactItem(Icons.chat, _getTranslation('telegram_chat'), AppConstants.telegramChat, isDark),
-                    _buildContactItem(Icons.code, _getTranslation('github'), AppConstants.githubRepo, isDark),
-                    _buildContactItem(Icons.email, _getTranslation('email'), AppConstants.supportEmail, isDark),
-                  ],
-                ),
               ),
             ],
           ),
@@ -472,31 +415,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: Text(_getTranslation('close')),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildContactItem(IconData icon, String label, String url, bool isDark) {
-    return InkWell(
-      onTap: () => _launchUrl(url),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4),
-        child: Row(
-          children: [
-            Icon(icon, size: 20, color: AppTheme.accentGold),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                label,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: isDark ? Colors.white : Colors.black,
-                ),
-              ),
-            ),
-            const Icon(Icons.open_in_new, size: 16, color: Colors.grey),
-          ],
-        ),
       ),
     );
   }
