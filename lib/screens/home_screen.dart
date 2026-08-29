@@ -10,8 +10,15 @@ import '../utils/constants.dart';
 
 class HomeScreen extends StatefulWidget {
   final Function(bool) onThemeChanged;
+  final Function(String) onLanguageChanged;
+  final String currentLanguage;
 
-  const HomeScreen({super.key, required this.onThemeChanged});
+  const HomeScreen({
+    super.key,
+    required this.onThemeChanged,
+    required this.onLanguageChanged,
+    required this.currentLanguage,
+  });
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -19,30 +26,23 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
-  String _currentLanguage = 'ru';
-  late List<Widget> _pages;
+  late String _currentLanguage;
   bool _permissionRequested = false;
 
   @override
   void initState() {
     super.initState();
-    _loadLanguage();
+    _currentLanguage = widget.currentLanguage;
   }
 
-  Future<void> _loadLanguage() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _currentLanguage = prefs.getString('language') ?? 'ru';
-      _pages = [
-        LanguagesScreen(currentLanguage: _currentLanguage),
-        EditorScreen(currentLanguage: _currentLanguage),
-        FilesScreen(currentLanguage: _currentLanguage),
-        SettingsScreen(
-          currentLanguage: _currentLanguage,
-          onThemeChanged: widget.onThemeChanged,
-        ),
-      ];
-    });
+  @override
+  void didUpdateWidget(HomeScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.currentLanguage != widget.currentLanguage) {
+      setState(() {
+        _currentLanguage = widget.currentLanguage;
+      });
+    }
   }
 
   void _onTabChanged(int index) {
@@ -72,8 +72,19 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final pages = [
+      LanguagesScreen(currentLanguage: _currentLanguage),
+      EditorScreen(currentLanguage: _currentLanguage),
+      FilesScreen(currentLanguage: _currentLanguage),
+      SettingsScreen(
+        currentLanguage: _currentLanguage,
+        onThemeChanged: widget.onThemeChanged,
+        onLanguageChanged: widget.onLanguageChanged,
+      ),
+    ];
+
     return Scaffold(
-      body: _pages.isNotEmpty ? _pages[_selectedIndex] : const Center(child: CircularProgressIndicator()),
+      body: pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onTabChanged,
