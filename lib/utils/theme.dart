@@ -56,6 +56,11 @@ class AppTheme {
       unselectedItemColor: Colors.grey,
       elevation: 8,
     ),
+    dropdownTheme: DropdownThemeData(
+      dropdownColor: cardPurple,
+      elevation: 8,
+      menuMaxHeight: 300,
+    ),
   );
 
   static ThemeData lightTheme = ThemeData(
@@ -102,6 +107,11 @@ class AppTheme {
       selectedItemColor: primaryPurple,
       unselectedItemColor: Colors.grey,
       elevation: 8,
+    ),
+    dropdownTheme: DropdownThemeData(
+      dropdownColor: whiteBackground,
+      elevation: 8,
+      menuMaxHeight: 300,
     ),
   );
 
