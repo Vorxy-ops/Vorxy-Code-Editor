@@ -1,7 +1,7 @@
 name: vorxy_code_editor
 description: Vorxy Code Editor - IDE для программистов
 publish_to: none
-version: 1.0.0+1
+version: 3.7.7+1
 
 environment:
   sdk: ">=3.4.0 <4.0.0"
