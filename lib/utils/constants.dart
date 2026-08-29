@@ -1,6 +1,6 @@
-class AppConstants {
+ class AppConstants {
   static const String appName = 'Vorxy Code Editor';
-  static const String version = '3.2.0';
+  static const String version = '3.3.2';
   static const String developer = 'GOSTOWN Co.';
   static const String telegramChannel = 'https://t.me/VorxyCodeEditor';
   static const String telegramChat = 'https://t.me/VorxyCodeEditorChat';
@@ -33,6 +33,10 @@ class AppConstants {
       'version': 'Версия',
       'developer': 'Разработчик',
       'exit': 'Выйти',
+      'yes': 'Да',
+      'no': 'Нет',
+      'exit_app': 'Выйти из приложения',
+      'exit_app_confirm': 'Вы действительно хотите выйти?',
       'language': 'Язык интерфейса',
       'save': 'Сохранить',
       'done': 'Готово',
@@ -40,6 +44,8 @@ class AppConstants {
       'language_changed': 'Язык изменён на',
       'file_saved': 'Файл сохранён',
       'file_saved_msg': 'Файл сохранён',
+      'file_loaded': 'Файл загружен',
+      'unsupported_extension': 'Неподдерживаемое расширение файла',
       'error': 'Ошибка',
       'close': 'Закрыть',
       'general': 'Общие',
@@ -112,6 +118,10 @@ class AppConstants {
       'version': 'Version',
       'developer': 'Developer',
       'exit': 'Exit',
+      'yes': 'Yes',
+      'no': 'No',
+      'exit_app': 'Exit App',
+      'exit_app_confirm': 'Do you really want to exit?',
       'language': 'Interface Language',
       'save': 'Save',
       'done': 'Done',
@@ -119,6 +129,8 @@ class AppConstants {
       'language_changed': 'Language changed to',
       'file_saved': 'File saved',
       'file_saved_msg': 'File saved',
+      'file_loaded': 'File loaded',
+      'unsupported_extension': 'Unsupported file extension',
       'error': 'Error',
       'close': 'Close',
       'general': 'General',
@@ -216,4 +228,4 @@ class AppConstants {
   static String getTerms(String langCode) {
     return termsTranslations[langCode] ?? termsTranslations['ru']!;
   }
-}
+ }
