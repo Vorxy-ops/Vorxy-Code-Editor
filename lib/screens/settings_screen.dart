@@ -71,19 +71,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _launchUrl(String url) async {
     try {
       final uri = Uri.parse(url);
+      
       if (await canLaunchUrl(uri)) {
-        await launchUrl(uri, mode: LaunchMode.externalApplication);
+        await launchUrl(
+          uri,
+          mode: LaunchMode.platformDefault,
+        );
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('${_getTranslation('error')}: ${_getTranslation('cannot_open_link')} $url')),
+            SnackBar(
+              content: Text('${_getTranslation('cannot_open_link')} $url'),
+              backgroundColor: Colors.orange,
+            ),
           );
         }
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${_getTranslation('error')}: $e')),
+          SnackBar(
+            content: Text('${_getTranslation('error')}: $e'),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     }
@@ -96,19 +106,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
         path: AppConstants.supportEmail,
         query: 'subject=${Uri.encodeComponent(_getTranslation('bug_report_subject'))}&body=${Uri.encodeComponent(_getTranslation('bug_report_body'))}',
       );
+      
       if (await canLaunchUrl(email)) {
-        await launchUrl(email);
+        await launchUrl(
+          email,
+          mode: LaunchMode.platformDefault,
+        );
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('${_getTranslation('error')}: ${_getTranslation('email_error')}')),
+            SnackBar(
+              content: Text(_getTranslation('email_error')),
+              backgroundColor: Colors.orange,
+            ),
           );
         }
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${_getTranslation('error')}: $e')),
+          SnackBar(
+            content: Text('${_getTranslation('error')}: $e'),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     }
@@ -141,8 +161,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    
     return Scaffold(
       appBar: AppBar(
         title: Text(_getTranslation('settings')),
@@ -159,7 +177,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _buildLanguageTile(),
           _buildSectionHeader(_getTranslation('about_app')),
           _buildAboutTile(),
-          _buildContactSection(),
           _buildSectionHeader(_getTranslation('support')),
           _buildIconTile(
             icon: Icons.bug_report,
@@ -259,33 +276,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
       trailing: const Icon(Icons.arrow_forward_ios, size: 16),
       onTap: () => _showAboutDialog(),
-    );
-  }
-
-  Widget _buildContactSection() {
-    return Column(
-      children: [
-        _buildIconTile(
-          icon: Icons.telegram,
-          title: _getTranslation('telegram_channel'),
-          onTap: () => _launchUrl(AppConstants.telegramChannel),
-        ),
-        _buildIconTile(
-          icon: Icons.chat,
-          title: _getTranslation('telegram_chat'),
-          onTap: () => _launchUrl(AppConstants.telegramChat),
-        ),
-        _buildIconTile(
-          icon: Icons.code,
-          title: _getTranslation('github'),
-          onTap: () => _launchUrl(AppConstants.githubRepo),
-        ),
-        _buildIconTile(
-          icon: Icons.email,
-          title: _getTranslation('email'),
-          onTap: _sendEmail,
-        ),
-      ],
     );
   }
 
