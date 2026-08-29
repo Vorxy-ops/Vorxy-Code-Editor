@@ -15,6 +15,6 @@ workflows:
         script: flutter pub get
       - name: Build APK
         script: |
-          flutter build apk --release --no-tree-shake-icons --output=build/app/outputs/flutter-apk/Vorxy_Code_Editor.apk
+          flutter build apk --release --no-tree-shake-icons
     artifacts:
-      - build/app/outputs/flutter-apk/Vorxy_Code_Editor.apk
+      - build/app/outputs/flutter-apk/app-release.apk
