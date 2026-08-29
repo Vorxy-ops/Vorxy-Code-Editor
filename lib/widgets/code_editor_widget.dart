@@ -66,6 +66,8 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -122,9 +124,10 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
                   language: widget.language.toLowerCase(),
                   theme: AppTheme.codeTheme,
                   padding: const EdgeInsets.all(12),
-                  textStyle: const TextStyle(
+                  textStyle: TextStyle(
                     fontSize: 14,
                     fontFamily: 'monospace',
+                    color: isDark ? Colors.white : Colors.black,
                   ),
                 ),
               ),
@@ -138,28 +141,34 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
             maxLines: null,
             minLines: 10,
             expands: true,
-            style: const TextStyle(
-              color: Colors.white70,
+            style: TextStyle(
+              color: isDark ? Colors.white : Colors.black,
               fontSize: 14,
               fontFamily: 'monospace',
             ),
             decoration: InputDecoration(
               hintText: _getTranslation('code_ready'),
-              hintStyle: const TextStyle(color: Colors.grey),
+              hintStyle: TextStyle(
+                color: isDark ? Colors.grey : Colors.grey.shade600,
+              ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: Colors.grey),
+                borderSide: BorderSide(
+                  color: isDark ? Colors.grey : Colors.grey.shade400,
+                ),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: Colors.grey),
+                borderSide: BorderSide(
+                  color: isDark ? Colors.grey : Colors.grey.shade400,
+                ),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
                 borderSide: const BorderSide(color: AppTheme.accentGold),
               ),
               filled: true,
-              fillColor: Colors.black26,
+              fillColor: isDark ? Colors.black : Colors.white,
             ),
             onChanged: _onCodeChanged,
           ),
