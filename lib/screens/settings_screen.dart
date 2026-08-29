@@ -68,30 +68,46 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _launchUrl(String url) async {
-    final uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    } else {
+    try {
+      final uri = Uri.parse(url);
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('${_getTranslation('error')}: ${_getTranslation('cannot_open_link')} $url')),
+          );
+        }
+      }
+    } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${_getTranslation('error')}: $url')),
+          SnackBar(content: Text('${_getTranslation('error')}: $e')),
         );
       }
     }
   }
 
   Future<void> _sendEmail() async {
-    final email = Uri(
-      scheme: 'mailto',
-      path: AppConstants.supportEmail,
-      query: 'subject=${Uri.encodeComponent(_getTranslation('bug_report_subject'))}&body=${Uri.encodeComponent(_getTranslation('bug_report_body'))}',
-    );
-    if (await canLaunchUrl(email)) {
-      await launchUrl(email);
-    } else {
+    try {
+      final email = Uri(
+        scheme: 'mailto',
+        path: AppConstants.supportEmail,
+        query: 'subject=${Uri.encodeComponent(_getTranslation('bug_report_subject'))}&body=${Uri.encodeComponent(_getTranslation('bug_report_body'))}',
+      );
+      if (await canLaunchUrl(email)) {
+        await launchUrl(email);
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('${_getTranslation('error')}: ${_getTranslation('email_error')}')),
+          );
+        }
+      }
+    } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${_getTranslation('error')}: ${_getTranslation('email_error')}')),
+          SnackBar(content: Text('${_getTranslation('error')}: $e')),
         );
       }
     }
