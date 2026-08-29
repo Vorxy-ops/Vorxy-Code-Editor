@@ -8,11 +8,13 @@ import '../utils/constants.dart';
 class SettingsScreen extends StatefulWidget {
   final String currentLanguage;
   final Function(bool) onThemeChanged;
+  final Function(String) onLanguageChanged;
 
   const SettingsScreen({
     super.key,
     required this.currentLanguage,
     required this.onThemeChanged,
+    required this.onLanguageChanged,
   });
 
   @override
@@ -58,7 +60,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     setState(() {
       _currentLanguage = langCode;
     });
-    widget.onThemeChanged(_isDarkMode);
+    widget.onLanguageChanged(langCode);
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -186,7 +188,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           _buildSectionHeader(_getTranslation('legal')),
           _buildIconTile(
-            icon: Icons.description,
+            icon: Icons.article,
             title: _getTranslation('terms'),
             onTap: () => _showLegalDialog(
               _getTranslation('terms_title'),
@@ -194,7 +196,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
           _buildIconTile(
-            icon: Icons.privacy_tip,
+            icon: Icons.shield,
             title: _getTranslation('privacy_policy'),
             onTap: () => _showLegalDialog(
               _getTranslation('privacy_title'),
