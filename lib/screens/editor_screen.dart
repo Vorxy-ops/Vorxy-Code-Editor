@@ -341,7 +341,9 @@ $_code
               children: [
                 Text(
                   _getTranslation('select_language_label'),
-                  style: const TextStyle(color: Colors.grey),
+                  style: TextStyle(
+                    color: isDark ? Colors.grey : Colors.grey.shade700,
+                  ),
                 ),
                 const SizedBox(width: 8),
                 DropdownButton<String>(
