@@ -25,6 +25,8 @@ class CodeEditorWidget extends StatefulWidget {
 class _CodeEditorWidgetState extends State<CodeEditorWidget> {
   late TextEditingController _controller;
   final FocusNode _focusNode = FocusNode();
+  String _displayCode = '';
+  bool _isProcessing = false;
 
   String _getTranslation(String key) {
     final translations = AppConstants.translations[widget.currentLanguage] ?? AppConstants.translations['ru']!;
@@ -35,6 +37,7 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
   void initState() {
     super.initState();
     _controller = TextEditingController(text: widget.code);
+    _displayCode = widget.code;
   }
 
   @override
@@ -42,7 +45,23 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.code != widget.code) {
       _controller.text = widget.code;
+      _displayCode = widget.code;
     }
+  }
+
+  void _onCodeChanged(String value) {
+    if (_isProcessing) return;
+    _isProcessing = true;
+    
+    setState(() {
+      _displayCode = value;
+    });
+    
+    widget.onCodeChanged(value);
+    
+    Future.delayed(const Duration(milliseconds: 50), () {
+      _isProcessing = false;
+    });
   }
 
   @override
@@ -63,7 +82,7 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
             ),
             const Spacer(),
             Text(
-              '${_controller.text.split('\n').length} ${_getTranslation('line')}',
+              '${_displayCode.split('\n').length} ${_getTranslation('line')}',
               style: const TextStyle(
                 color: Colors.grey,
                 fontSize: 12,
@@ -96,14 +115,17 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
                 ],
               ),
               const Divider(height: 1, color: Colors.grey),
-              HighlightView(
-                _controller.text.isEmpty ? ' ' : _controller.text,
-                language: widget.language.toLowerCase(),
-                theme: AppTheme.codeTheme,
-                padding: const EdgeInsets.all(12),
-                textStyle: const TextStyle(
-                  fontSize: 14,
-                  fontFamily: 'monospace',
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: HighlightView(
+                  _displayCode.isEmpty ? ' ' : _displayCode,
+                  language: widget.language.toLowerCase(),
+                  theme: AppTheme.codeTheme,
+                  padding: const EdgeInsets.all(12),
+                  textStyle: const TextStyle(
+                    fontSize: 14,
+                    fontFamily: 'monospace',
+                  ),
                 ),
               ),
             ],
@@ -139,9 +161,7 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
               filled: true,
               fillColor: Colors.black26,
             ),
-            onChanged: (value) {
-              widget.onCodeChanged(value);
-            },
+            onChanged: _onCodeChanged,
           ),
         ),
       ],
