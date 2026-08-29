@@ -201,7 +201,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           _buildSectionHeader(_getTranslation('legal')),
           _buildIconTile(
-            icon: Icons.privacy_tip,
+            icon: Icons.gavel,
             title: _getTranslation('privacy_policy'),
             onTap: () => _showLegalDialog(
               _getTranslation('privacy_title'),
@@ -209,7 +209,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
           _buildIconTile(
-            icon: Icons.gavel,
+            icon: Icons.privacy_tip,
             title: _getTranslation('terms'),
             onTap: () => _showLegalDialog(
               _getTranslation('terms_title'),
