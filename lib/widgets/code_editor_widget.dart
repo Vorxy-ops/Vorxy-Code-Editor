@@ -27,6 +27,8 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
   final FocusNode _focusNode = FocusNode();
   String _displayCode = '';
   bool _isProcessing = false;
+  ScrollController _scrollController = ScrollController();
+  ScrollController _lineScrollController = ScrollController();
 
   String _getTranslation(String key) {
     final translations = AppConstants.translations[widget.currentLanguage] ?? AppConstants.translations['ru']!;
@@ -38,6 +40,12 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
     super.initState();
     _controller = TextEditingController(text: widget.code);
     _displayCode = widget.code;
+    
+    _scrollController.addListener(() {
+      if (_lineScrollController.hasClients) {
+        _lineScrollController.jumpTo(_scrollController.offset);
+      }
+    });
   }
 
   @override
@@ -64,9 +72,15 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
     });
   }
 
+  List<String> _getLines(String text) {
+    if (text.isEmpty) return [''];
+    return text.split('\n');
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final lines = _getLines(_displayCode);
     
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -84,7 +98,7 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
             ),
             const Spacer(),
             Text(
-              '${_displayCode.split('\n').length} ${_getTranslation('line')}',
+              '${lines.length} ${_getTranslation('line')}',
               style: const TextStyle(
                 color: Colors.grey,
                 fontSize: 12,
@@ -95,39 +109,61 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
         const SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
-            color: Colors.black26,
+            color: isDark ? Colors.black : Colors.white,
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.grey.shade800),
+            border: Border.all(color: isDark ? Colors.grey.shade800 : Colors.grey.shade400),
           ),
-          child: Column(
+          child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  const SizedBox(width: 8),
-                  const Text(
-                    'Ln 1, Col 1',
-                    style: TextStyle(
-                      color: Colors.grey,
-                      fontSize: 11,
-                    ),
+              // Номера строк
+              Container(
+                width: 40,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                decoration: BoxDecoration(
+                  color: isDark ? Colors.grey.shade900 : Colors.grey.shade200,
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(8),
+                    bottomLeft: Radius.circular(8),
                   ),
-                  const Spacer(),
-                ],
+                ),
+                child: ListView.builder(
+                  controller: _lineScrollController,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: lines.length,
+                  shrinkWrap: true,
+                  itemBuilder: (context, index) {
+                    return Container(
+                      height: 22,
+                      alignment: Alignment.centerRight,
+                      padding: const EdgeInsets.only(right: 8),
+                      child: Text(
+                        '${index + 1}',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontFamily: 'monospace',
+                          color: isDark ? Colors.grey.shade600 : Colors.grey.shade700,
+                        ),
+                      ),
+                    );
+                  },
+                ),
               ),
-              const Divider(height: 1, color: Colors.grey),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: HighlightView(
-                  _displayCode.isEmpty ? ' ' : _displayCode,
-                  language: widget.language.toLowerCase(),
-                  theme: AppTheme.codeTheme,
-                  padding: const EdgeInsets.all(12),
-                  textStyle: TextStyle(
-                    fontSize: 14,
-                    fontFamily: 'monospace',
-                    color: isDark ? Colors.white : Colors.black,
+              // Код с подсветкой
+              Expanded(
+                child: SingleChildScrollView(
+                  controller: _scrollController,
+                  scrollDirection: Axis.horizontal,
+                  child: HighlightView(
+                    _displayCode.isEmpty ? ' ' : _displayCode,
+                    language: widget.language.toLowerCase(),
+                    theme: isDark ? _getDarkTheme() : _getLightTheme(),
+                    padding: const EdgeInsets.all(12),
+                    textStyle: TextStyle(
+                      fontSize: 14,
+                      fontFamily: 'monospace',
+                      color: isDark ? Colors.white : Colors.black,
+                    ),
                   ),
                 ),
               ),
@@ -177,10 +213,52 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
     );
   }
 
+  Map<String, TextStyle> _getDarkTheme() {
+    return {
+      'root': TextStyle(
+        backgroundColor: Colors.black,
+        color: Colors.white,
+        fontSize: 14,
+        fontFamily: 'monospace',
+      ),
+      'keyword': TextStyle(color: Colors.purple.shade300),
+      'string': TextStyle(color: Colors.green.shade300),
+      'comment': TextStyle(color: Colors.grey.shade600, fontStyle: FontStyle.italic),
+      'number': TextStyle(color: Colors.blue.shade300),
+      'function': TextStyle(color: Colors.yellow.shade300),
+      'class': TextStyle(color: Colors.orange.shade300),
+      'variable': TextStyle(color: Colors.cyan.shade300),
+      'operator': TextStyle(color: Colors.red.shade300),
+      'built_in': TextStyle(color: Colors.teal.shade300),
+    };
+  }
+
+  Map<String, TextStyle> _getLightTheme() {
+    return {
+      'root': TextStyle(
+        backgroundColor: Colors.white,
+        color: Colors.black,
+        fontSize: 14,
+        fontFamily: 'monospace',
+      ),
+      'keyword': TextStyle(color: Colors.purple.shade700),
+      'string': TextStyle(color: Colors.green.shade700),
+      'comment': TextStyle(color: Colors.grey.shade500, fontStyle: FontStyle.italic),
+      'number': TextStyle(color: Colors.blue.shade700),
+      'function': TextStyle(color: Colors.orange.shade700),
+      'class': TextStyle(color: Colors.deepPurple.shade700),
+      'variable': TextStyle(color: Colors.cyan.shade700),
+      'operator': TextStyle(color: Colors.red.shade700),
+      'built_in': TextStyle(color: Colors.teal.shade700),
+    };
+  }
+
   @override
   void dispose() {
     _controller.dispose();
     _focusNode.dispose();
+    _scrollController.dispose();
+    _lineScrollController.dispose();
     super.dispose();
   }
 }
