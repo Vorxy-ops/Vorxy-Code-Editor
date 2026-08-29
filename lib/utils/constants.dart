@@ -1,4 +1,4 @@
- class AppConstants {
+class AppConstants {
   static const String appName = 'Vorxy Code Editor';
   static const String version = '3.3.2';
   static const String developer = 'GOSTOWN Co.';
@@ -62,6 +62,8 @@
       'bug_report_subject': 'Сообщение об ошибке в Vorxy Code Editor',
       'bug_report_body': 'Опишите ошибку подробно:',
       'email_error': 'Не удалось открыть почтовое приложение',
+      'cannot_open_link': 'Не удалось открыть ссылку:',
+      'error_loading_file': 'Ошибка загрузки файла:',
       'about_full_text': 
         'Vorxy Code Editor — это мобильная среда разработки для устройств на базе Android. '
         'Приложение позволяет писать, редактировать и сохранять код на 10 языках программирования '
@@ -147,6 +149,8 @@
       'bug_report_subject': 'Bug report for Vorxy Code Editor',
       'bug_report_body': 'Describe the bug in detail:',
       'email_error': 'Unable to open email app',
+      'cannot_open_link': 'Unable to open link:',
+      'error_loading_file': 'Error loading file:',
       'about_full_text':
         'Vorxy Code Editor is a mobile development environment for Android devices. '
         'The application allows you to write, edit and save code in 10 programming '
@@ -228,4 +232,4 @@
   static String getTerms(String langCode) {
     return termsTranslations[langCode] ?? termsTranslations['ru']!;
   }
- }
+}
