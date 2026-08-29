@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../utils/theme.dart';
 import '../utils/constants.dart';
@@ -17,6 +16,8 @@ class FilesScreen extends StatefulWidget {
 class _FilesScreenState extends State<FilesScreen> {
   List<File> _files = [];
   bool _isLoading = true;
+  bool _isSelectionMode = false;
+  Set<int> _selectedIndices = {};
 
   @override
   void initState() {
@@ -27,6 +28,8 @@ class _FilesScreenState extends State<FilesScreen> {
   Future<void> _loadSavedFiles() async {
     setState(() {
       _isLoading = true;
+      _isSelectionMode = false;
+      _selectedIndices.clear();
     });
 
     try {
@@ -68,8 +71,181 @@ class _FilesScreenState extends State<FilesScreen> {
     }
   }
 
+  Future<void> _refreshFiles() async {
+    await _loadSavedFiles();
+  }
+
+  void _toggleSelectionMode() {
+    setState(() {
+      _isSelectionMode = !_isSelectionMode;
+      _selectedIndices.clear();
+    });
+  }
+
+  void _selectFile(int index) {
+    setState(() {
+      if (_selectedIndices.contains(index)) {
+        _selectedIndices.remove(index);
+      } else {
+        _selectedIndices.add(index);
+      }
+    });
+  }
+
+  Future<void> _deleteFile(File file, int index) async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(_getTranslation('delete_file')),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('${_getTranslation('delete_confirm')}: ${file.path.split('/').last}?'),
+            const SizedBox(height: 8),
+            Text(
+              _getTranslation('delete_note'),
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(_getTranslation('no')),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(_getTranslation('yes')),
+          ),
+        ],
+      ),
+    );
+
+    if (result == true) {
+      try {
+        await file.delete();
+        setState(() {
+          _files.removeAt(index);
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${_getTranslation('file_deleted')}: ${file.path.split('/').last}')),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${_getTranslation('error')}: $e')),
+        );
+      }
+    }
+  }
+
+  Future<void> _deleteSelectedFiles() async {
+    final count = _selectedIndices.length;
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(_getTranslation('delete_files')),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('${_getTranslation('delete_files_confirm')} ($count)?'),
+            const SizedBox(height: 8),
+            Text(
+              _getTranslation('delete_note'),
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(_getTranslation('no')),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(_getTranslation('yes')),
+          ),
+        ],
+      ),
+    );
+
+    if (result == true) {
+      try {
+        final filesToDelete = _selectedIndices.toList()..sort((a, b) => b.compareTo(a));
+        for (var index in filesToDelete) {
+          await _files[index].delete();
+          _files.removeAt(index);
+        }
+        setState(() {
+          _selectedIndices.clear();
+          _isSelectionMode = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${_getTranslation('file_deleted')}: $count ${_getTranslation('file')}')),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${_getTranslation('error')}: $e')),
+        );
+      }
+    }
+  }
+
+  Future<void> _deleteAllFiles() async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(_getTranslation('delete_all')),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(_getTranslation('delete_all_confirm') + '?'),
+            const SizedBox(height: 8),
+            Text(
+              _getTranslation('delete_all_note'),
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(_getTranslation('no')),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(_getTranslation('yes')),
+          ),
+        ],
+      ),
+    );
+
+    if (result == true) {
+      try {
+        for (var file in _files) {
+          await file.delete();
+        }
+        setState(() {
+          _files.clear();
+          _selectedIndices.clear();
+          _isSelectionMode = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(_getTranslation('file_deleted') + ': ${_getTranslation('all')}')),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${_getTranslation('error')}: $e')),
+        );
+      }
+    }
+  }
+
   String _getTranslation(String key) {
-    final translations = AppConstants.translations[widget.currentLanguage] ?? AppConstants.translations['ru']!;
+    final translations = AppConstants.translations[widget.currentLanguage] ??
+        AppConstants.translations['ru']!;
     return translations[key] ?? key;
   }
 
@@ -90,27 +266,65 @@ class _FilesScreenState extends State<FilesScreen> {
     }
   }
 
-  Future<void> _deleteFile(File file) async {
-    try {
-      await file.delete();
-      setState(() {
-        _files.remove(file);
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${_getTranslation('file_deleted')}: ${file.path.split('/').last}')),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${_getTranslation('error')}: $e')),
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(_getTranslation('files')),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh, color: AppTheme.accentGold),
+            onPressed: _refreshFiles,
+            tooltip: _getTranslation('refresh'),
+          ),
+          IconButton(
+            icon: Icon(
+              _isSelectionMode ? Icons.close : Icons.checklist,
+              color: AppTheme.accentGold,
+            ),
+            onPressed: _toggleSelectionMode,
+            tooltip: _getTranslation('select_files'),
+          ),
+          IconButton(
+            icon: const Icon(Icons.delete_sweep, color: Colors.red),
+            onPressed: _files.isEmpty ? null : _deleteAllFiles,
+            tooltip: _getTranslation('delete_all'),
+          ),
+        ],
+        bottom: _isSelectionMode && _selectedIndices.isNotEmpty
+            ? PreferredSize(
+                preferredSize: const Size.fromHeight(56),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '${_getTranslation('delete_selected')} (${_selectedIndices.length})',
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                      Row(
+                        children: [
+                          TextButton(
+                            onPressed: _toggleSelectionMode,
+                            child: Text(_getTranslation('cancel')),
+                          ),
+                          const SizedBox(width: 8),
+                          ElevatedButton(
+                            onPressed: _deleteSelectedFiles,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.red,
+                              foregroundColor: Colors.white,
+                            ),
+                            child: Text(_getTranslation('delete_selected')),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            : null,
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -148,22 +362,25 @@ class _FilesScreenState extends State<FilesScreen> {
                       sizeStr = '${(size / 1048576).toStringAsFixed(1)} MB';
                     }
 
-                    return Dismissible(
-                      key: Key(file.path),
-                      background: Container(
-                        color: Colors.red,
-                        alignment: Alignment.centerRight,
-                        padding: const EdgeInsets.only(right: 20),
-                        child: const Icon(Icons.delete, color: Colors.white),
-                      ),
-                      direction: DismissDirection.endToStart,
-                      onDismissed: (direction) => _deleteFile(file),
-                      child: ListTile(
-                        leading: const Icon(Icons.insert_drive_file, color: Colors.grey),
-                        title: Text(name),
-                        subtitle: Text(sizeStr),
-                        onTap: () => _openFile(file),
-                      ),
+                    return ListTile(
+                      leading: _isSelectionMode
+                          ? Checkbox(
+                              value: _selectedIndices.contains(index),
+                              onChanged: (value) => _selectFile(index),
+                              activeColor: AppTheme.accentGold,
+                            )
+                          : const Icon(Icons.insert_drive_file, color: Colors.grey),
+                      title: Text(name),
+                      subtitle: Text(sizeStr),
+                      onTap: _isSelectionMode
+                          ? () => _selectFile(index)
+                          : () => _openFile(file),
+                      onLongPress: () {
+                        if (!_isSelectionMode) {
+                          _toggleSelectionMode();
+                          _selectFile(index);
+                        }
+                      },
                     );
                   },
                 ),
