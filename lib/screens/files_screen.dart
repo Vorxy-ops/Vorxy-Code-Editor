@@ -244,8 +244,7 @@ class _FilesScreenState extends State<FilesScreen> {
   }
 
   String _getTranslation(String key) {
-    final translations = AppConstants.translations[widget.currentLanguage] ??
-        AppConstants.translations['ru']!;
+    final translations = AppConstants.translations[widget.currentLanguage] ?? AppConstants.translations['ru']!;
     return translations[key] ?? key;
   }
 
@@ -268,6 +267,8 @@ class _FilesScreenState extends State<FilesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return Scaffold(
       appBar: AppBar(
         title: Text(_getTranslation('files')),
@@ -279,7 +280,7 @@ class _FilesScreenState extends State<FilesScreen> {
           ),
           IconButton(
             icon: Icon(
-              _isSelectionMode ? Icons.close : Icons.checklist,
+              _isSelectionMode ? Icons.checklist : Icons.checklist,
               color: AppTheme.accentGold,
             ),
             onPressed: _toggleSelectionMode,
@@ -301,7 +302,9 @@ class _FilesScreenState extends State<FilesScreen> {
                     children: [
                       Text(
                         '${_getTranslation('delete_selected')} (${_selectedIndices.length})',
-                        style: const TextStyle(color: Colors.white),
+                        style: TextStyle(
+                          color: isDark ? Colors.white : Colors.black,
+                        ),
                       ),
                       Row(
                         children: [
@@ -374,7 +377,7 @@ class _FilesScreenState extends State<FilesScreen> {
                       subtitle: Text(sizeStr),
                       onTap: _isSelectionMode
                           ? () => _selectFile(index)
-                          : () => _openFile(file),
+                          : () => _deleteFile(file, index),
                       onLongPress: () {
                         if (!_isSelectionMode) {
                           _toggleSelectionMode();
