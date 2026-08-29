@@ -56,6 +56,28 @@ class _EditorScreenState extends State<EditorScreen> {
     }
   }
 
+  String _getLanguageFromExtension(String extension) {
+    switch (extension.toLowerCase()) {
+      case '.py': return 'Python';
+      case '.js': return 'JavaScript';
+      case '.c': return 'C';
+      case '.cpp': return 'C++';
+      case '.java': return 'Java';
+      case '.cs': return 'C#';
+      case '.vb': return 'Visual Basic';
+      case '.sql': return 'SQL';
+      case '.r': return 'R';
+      case '.rs': return 'Rust';
+      case '.html': return 'HTML';
+      default: return '';
+    }
+  }
+
+  bool _isSupportedExtension(String extension) {
+    final supported = ['.py', '.js', '.c', '.cpp', '.java', '.cs', '.vb', '.sql', '.r', '.rs', '.html'];
+    return supported.contains(extension.toLowerCase());
+  }
+
   Future<void> _loadLastFile() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -64,13 +86,61 @@ class _EditorScreenState extends State<EditorScreen> {
         final file = File(path);
         if (await file.exists()) {
           final content = await file.readAsString();
+          final ext = path.split('.').last;
+          final lang = _getLanguageFromExtension('.$ext');
           setState(() {
             _code = content;
             _fileName = path.split('/').last.split('.').first;
+            if (lang.isNotEmpty) {
+              _language = lang;
+            }
           });
         }
       }
     } catch (e) {}
+  }
+
+  Future<void> _openFile() async {
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        allowMultiple: false,
+        allowedExtensions: ['py', 'js', 'c', 'cpp', 'java', 'cs', 'vb', 'sql', 'r', 'rs', 'html'],
+      );
+
+      if (result == null) return;
+
+      final filePath = result.files.single.path;
+      if (filePath == null) return;
+
+      final file = File(filePath);
+      final content = await file.readAsString();
+      final ext = filePath.split('.').last;
+      final lang = _getLanguageFromExtension('.$ext');
+
+      if (lang.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(_getTranslation('unsupported_extension'))),
+        );
+        return;
+      }
+
+      setState(() {
+        _code = content;
+        _fileName = filePath.split('/').last.split('.').first;
+        _language = lang;
+      });
+
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('lastFilePath', filePath);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${_getTranslation('file_loaded')}: ${filePath.split('/').last}')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${_getTranslation('error')}: $e')),
+      );
+    }
   }
 
   Future<void> _saveFile() async {
@@ -174,6 +244,10 @@ class _EditorScreenState extends State<EditorScreen> {
       appBar: AppBar(
         title: Text(_getTranslation('editor')),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.folder_open, color: AppTheme.accentGold),
+            onPressed: _openFile,
+          ),
           IconButton(
             icon: const Icon(Icons.save, color: AppTheme.accentGold),
             onPressed: _saveFile,
