@@ -21,8 +21,8 @@ android {
         applicationId "com.vorxy.code_editor"
         minSdk 24
         targetSdk 36
-        versionCode 3
-        versionName "3.2.0"
+        versionCode 1
+        versionName "3.7.7"
         multiDexEnabled true
     }
 
