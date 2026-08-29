@@ -14,6 +14,7 @@ class LanguagesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final languages = _getLocalizedLanguages(currentLanguage);
     return Scaffold(
       appBar: AppBar(
@@ -32,6 +33,7 @@ class LanguagesScreen extends StatelessWidget {
           itemBuilder: (context, index) {
             final language = languages[index];
             return Card(
+              color: isDark ? AppTheme.cardPurple : AppTheme.lightCard,
               child: Center(
                 child: Padding(
                   padding: const EdgeInsets.all(12),
@@ -40,19 +42,19 @@ class LanguagesScreen extends StatelessWidget {
                     children: [
                       Text(
                         language['name'] ?? '',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: AppTheme.accentGold,
+                          color: isDark ? AppTheme.accentGold : AppTheme.primaryPurple,
                         ),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 4),
                       Text(
                         language['description'] ?? '',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
-                          color: Colors.grey,
+                          color: isDark ? Colors.grey : Colors.grey.shade700,
                         ),
                         textAlign: TextAlign.center,
                       ),
