@@ -1,6 +1,6 @@
 class AppConstants {
   static const String appName = 'Vorxy Code Editor';
-  static const String version = '3.3.5';
+  static const String version = '3.5.5';
   static const String developer = 'GOSTOWN Co.';
   static const String telegramChannel = 'https://t.me/VorxyCodeEditor';
   static const String telegramChat = 'https://t.me/VorxyCodeEditorChat';
@@ -8,8 +8,8 @@ class AppConstants {
   static const String supportEmail = 'vorxygtn@mail.ru';
 
   static const List<Map<String, String>> supportedLanguages = [
-    {'code': 'ru', 'name': 'Русский', 'flag': '🇷🇺'},
-    {'code': 'en', 'name': 'English', 'flag': '🇬🇧'},
+    {'code': 'ru', 'name': 'RUS'},
+    {'code': 'en', 'name': 'ENG'},
   ];
 
   static const Map<String, Map<String, String>> translations = {
@@ -19,6 +19,7 @@ class AppConstants {
       'languages': 'Языки программирования',
       'editor': 'Редактор',
       'files': 'Файлы',
+      'theme': 'Тема',
       'dark_theme': 'Тёмная тема',
       'light_theme': 'Светлая тема',
       'support': 'Поддержка',
@@ -114,6 +115,7 @@ class AppConstants {
       'languages': 'Programming Languages',
       'editor': 'Editor',
       'files': 'Files',
+      'theme': 'Theme',
       'dark_theme': 'Dark Theme',
       'light_theme': 'Light Theme',
       'support': 'Support',
