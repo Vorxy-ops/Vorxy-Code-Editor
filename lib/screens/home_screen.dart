@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'settings_screen.dart';
 import 'editor_screen.dart';
 import 'files_screen.dart';
@@ -20,6 +21,7 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
   String _currentLanguage = 'ru';
   late List<Widget> _pages;
+  bool _permissionRequested = false;
 
   @override
   void initState() {
@@ -43,6 +45,26 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  void _onTabChanged(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+    if (index == 0 && !_permissionRequested) {
+      _requestPermission();
+    }
+  }
+
+  Future<void> _requestPermission() async {
+    final status = await Permission.manageExternalStorage.request();
+    if (status.isGranted) {
+      setState(() {
+        _permissionRequested = true;
+      });
+    } else {
+      _requestPermission();
+    }
+  }
+
   String _getTranslation(String key) {
     final translations = AppConstants.translations[_currentLanguage] ?? AppConstants.translations['ru']!;
     return translations[key] ?? key;
@@ -54,7 +76,7 @@ class _HomeScreenState extends State<HomeScreen> {
       body: _pages.isNotEmpty ? _pages[_selectedIndex] : const Center(child: CircularProgressIndicator()),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
-        onTap: (index) => setState(() => _selectedIndex = index),
+        onTap: _onTabChanged,
         items: [
           BottomNavigationBarItem(icon: const Icon(Icons.code), label: _getTranslation('languages')),
           BottomNavigationBarItem(icon: const Icon(Icons.edit), label: _getTranslation('editor')),
