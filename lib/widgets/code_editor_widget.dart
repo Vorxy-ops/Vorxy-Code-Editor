@@ -143,7 +143,7 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
               child: Text(
                 stats,
                 style: TextStyle(
-                  color: Colors.grey.shade600,
+                  color: isDark ? Colors.grey.shade600 : Colors.grey.shade600,
                   fontSize: _getFontSize(stats),
                 ),
                 overflow: TextOverflow.visible,
@@ -162,7 +162,6 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Номера строк
               Container(
                 width: _getLineNumberWidth(lines.length),
                 padding: const EdgeInsets.symmetric(vertical: 12),
@@ -195,7 +194,6 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
                   },
                 ),
               ),
-              // Код с подсветкой
               Expanded(
                 child: SingleChildScrollView(
                   controller: _scrollController,
