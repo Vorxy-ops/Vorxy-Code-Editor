@@ -388,21 +388,15 @@ $_code
             Expanded(
               child: _isLoading
                   ? const Center(child: CircularProgressIndicator())
-                  : SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          CodeEditorWidget(
-                            code: _code,
-                            language: _language,
-                            currentLanguage: widget.currentLanguage,
-                            onCodeChanged: (newCode) {
-                              setState(() {
-                                _code = newCode;
-                              });
-                            },
-                          ),
-                        ],
-                      ),
+                  : CodeEditorWidget(
+                      code: _code,
+                      language: _language,
+                      currentLanguage: widget.currentLanguage,
+                      onCodeChanged: (newCode) {
+                        setState(() {
+                          _code = newCode;
+                        });
+                      },
                     ),
             ),
           ],
