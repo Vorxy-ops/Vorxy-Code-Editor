@@ -20,10 +20,12 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   bool _isDarkMode = true;
+  late String _currentLanguage;
 
   @override
   void initState() {
     super.initState();
+    _currentLanguage = widget.currentLanguage;
     _loadTheme();
   }
 
@@ -35,8 +37,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   String _getTranslation(String key) {
-    final translations = AppConstants.translations[widget.currentLanguage] ??
-        AppConstants.translations['ru']!;
+    final translations = AppConstants.translations[_currentLanguage] ?? AppConstants.translations['ru']!;
     return translations[key] ?? key;
   }
 
@@ -52,13 +53,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _changeLanguage(String langCode) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('language', langCode);
+    setState(() {
+      _currentLanguage = langCode;
+    });
+    widget.onThemeChanged(_isDarkMode);
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('${_getTranslation('language_changed')} ${langCode == 'ru' ? 'Русский' : 'English'}'),
         ),
       );
-      Navigator.pushReplacementNamed(context, '/settings');
     }
   }
 
@@ -70,6 +74,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('${_getTranslation('error')}: $url')),
+        );
+      }
+    }
+  }
+
+  Future<void> _sendEmail() async {
+    final email = Uri(
+      scheme: 'mailto',
+      path: AppConstants.supportEmail,
+      query: 'subject=${Uri.encodeComponent(_getTranslation('bug_report_subject'))}&body=${Uri.encodeComponent(_getTranslation('bug_report_body'))}',
+    );
+    if (await canLaunchUrl(email)) {
+      await launchUrl(email);
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${_getTranslation('error')}: ${_getTranslation('email_error')}')),
         );
       }
     }
@@ -107,7 +128,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _buildIconTile(
             icon: Icons.bug_report,
             title: _getTranslation('report_bug'),
-            onTap: () => _launchUrl('mailto:${AppConstants.supportEmail}'),
+            onTap: _sendEmail,
           ),
           _buildSectionHeader(_getTranslation('legal')),
           _buildIconTile(
@@ -115,7 +136,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             title: _getTranslation('privacy_policy'),
             onTap: () => _showLegalDialog(
               _getTranslation('privacy_title'),
-              AppConstants.getPrivacyPolicy(widget.currentLanguage),
+              AppConstants.getPrivacyPolicy(_currentLanguage),
             ),
           ),
           _buildIconTile(
@@ -123,7 +144,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             title: _getTranslation('terms'),
             onTap: () => _showLegalDialog(
               _getTranslation('terms_title'),
-              AppConstants.getTerms(widget.currentLanguage),
+              AppConstants.getTerms(_currentLanguage),
             ),
           ),
           _buildSectionHeader(''),
@@ -167,7 +188,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       leading: const Icon(Icons.language, color: AppTheme.accentGold),
       title: Text(_getTranslation('language')),
       subtitle: Text(
-        widget.currentLanguage == 'ru' ? 'Русский' : 'English',
+        _currentLanguage == 'ru' ? 'Русский' : 'English',
       ),
       trailing: const Icon(Icons.arrow_forward_ios, size: 16),
       onTap: () => _showLanguageDialog(),
@@ -218,11 +239,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const SizedBox(height: 4),
           Text(
             '${_getTranslation('developer')}: ${AppConstants.developer}',
-            style: const TextStyle(fontSize: 14),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            '${_getTranslation('system_requirements')}: ${_getTranslation('system_requirements_list')}',
             style: const TextStyle(fontSize: 14),
           ),
         ],
@@ -315,25 +331,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               Text(
                 _getTranslation('about_full_text'),
                 style: const TextStyle(fontSize: 14, height: 1.6),
-              ),
-              const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.grey.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '📱 ${_getTranslation('system_requirements')}',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(_getTranslation('system_requirements_list')),
-                  ],
-                ),
               ),
             ],
           ),
