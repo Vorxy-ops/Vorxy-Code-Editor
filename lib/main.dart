@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -81,8 +80,6 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  bool _isNavigating = false;
-
   @override
   void initState() {
     super.initState();
@@ -91,66 +88,52 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> _checkPermissionsAndNavigate() async {
     final status = await Permission.manageExternalStorage.status;
-    
     if (status.isGranted) {
-      await _navigateToHome();
-    } else {
-      final result = await Permission.manageExternalStorage.request();
-      if (result.isGranted) {
-        await _navigateToHome();
-      } else {
-        if (mounted) {
-          await Future.delayed(const Duration(milliseconds: 200));
-          exit(0);
-        }
+      await Future.delayed(const Duration(milliseconds: 300));
+      if (mounted) {
+        Navigator.pushReplacementNamed(context, '/home');
       }
-    }
-  }
-
-  Future<void> _navigateToHome() async {
-    if (_isNavigating) return;
-    _isNavigating = true;
-    
-    await Future.delayed(const Duration(milliseconds: 400));
-    if (mounted) {
-      Navigator.pushReplacementNamed(context, '/home');
+    } else {
+      final newStatus = await Permission.manageExternalStorage.request();
+      if (newStatus.isGranted) {
+        await Future.delayed(const Duration(milliseconds: 300));
+        if (mounted) {
+          Navigator.pushReplacementNamed(context, '/home');
+        }
+      } else {
+        _checkPermissionsAndNavigate();
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        exit(0);
-        return false;
-      },
-      child: Scaffold(
-        backgroundColor: const Color(0xFF1A0B2E),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'Vorxy Code Editor',
-                style: const TextStyle(
-                  color: Color(0xFFFFEB3B),
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'sans-serif',
-                ),
+    return Scaffold(
+      backgroundColor: const Color(0xFF1A0B2E),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Vorxy Code Editor',
+              style: const TextStyle(
+                color: Color(0xFFFFEB3B),
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'sans-serif',
               ),
-              const SizedBox(height: 8),
-              Text(
-                'developed by GOSTOWN Co.',
-                style: const TextStyle(
-                  color: Color(0xFFFFEB3B),
-                  fontSize: 16,
-                  fontWeight: FontWeight.normal,
-                  fontFamily: 'Montserrat',
-                ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'developed by GOSTOWN Co.',
+              style: const TextStyle(
+                color: Color(0xFFFFEB3B),
+                fontSize: 16,
+                fontWeight: FontWeight.normal,
+                fontFamily: 'Montserrat',
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
