@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:share_plus/share_plus.dart';
 import '../widgets/code_editor_widget.dart';
 import '../utils/theme.dart';
 import '../utils/constants.dart';
@@ -101,6 +102,35 @@ class _EditorScreenState extends State<EditorScreen> {
         setState(() {
           _isLoading = false;
         });
+      }
+    }
+  }
+
+  Future<void> _shareCode() async {
+    final String message = '''
+Vorxy Code Editor v${AppConstants.version}
+developed by GOSTOWN Co.
+
+Telegram-канал: ${AppConstants.telegramChannel}
+Чат Telegram: ${AppConstants.telegramChat}
+GitHub: ${AppConstants.githubRepo}
+Email: ${AppConstants.supportEmail}
+
+Код пользователя
+
+$_code
+''';
+
+    try {
+      await Share.share(message);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${_getTranslation('error')}: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     }
   }
@@ -278,10 +308,17 @@ class _EditorScreenState extends State<EditorScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return Scaffold(
       appBar: AppBar(
         title: Text(_getTranslation('editor')),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.share, color: AppTheme.accentGold),
+            onPressed: _code.isEmpty ? null : _shareCode,
+            tooltip: _getTranslation('share_code'),
+          ),
           IconButton(
             icon: _isLoading 
               ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
@@ -302,13 +339,25 @@ class _EditorScreenState extends State<EditorScreen> {
           children: [
             Row(
               children: [
-                const Text('Язык: ', style: TextStyle(color: Colors.grey)),
+                Text(
+                  _getTranslation('select_language_label'),
+                  style: const TextStyle(color: Colors.grey),
+                ),
+                const SizedBox(width: 8),
                 DropdownButton<String>(
                   value: _language,
-                  dropdownColor: AppTheme.cardPurple,
-                  style: const TextStyle(color: AppTheme.accentGold),
-                  underline: Container(height: 1, color: AppTheme.accentGold),
-                  icon: const Icon(Icons.arrow_drop_down, color: AppTheme.accentGold),
+                  dropdownColor: isDark ? AppTheme.cardPurple : AppTheme.lightCard,
+                  style: TextStyle(
+                    color: isDark ? AppTheme.accentGold : AppTheme.primaryPurple,
+                  ),
+                  underline: Container(
+                    height: 1,
+                    color: isDark ? AppTheme.accentGold : AppTheme.primaryPurple,
+                  ),
+                  icon: Icon(
+                    Icons.arrow_drop_down,
+                    color: isDark ? AppTheme.accentGold : AppTheme.primaryPurple,
+                  ),
                   items: const [
                     DropdownMenuItem(value: 'Python', child: Text('Python')),
                     DropdownMenuItem(value: 'JavaScript', child: Text('JavaScript')),
@@ -331,7 +380,6 @@ class _EditorScreenState extends State<EditorScreen> {
                     });
                   },
                 ),
-                const Spacer(),
               ],
             ),
             const SizedBox(height: 8),
