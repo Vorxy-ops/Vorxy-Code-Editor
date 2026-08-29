@@ -26,7 +26,6 @@ class _EditorScreenState extends State<EditorScreen> with AutomaticKeepAliveClie
   String _fileName = 'main';
   bool _isLoading = false;
   bool _isSaving = false;
-  bool _isInitialized = false;
 
   @override
   void initState() {
@@ -108,7 +107,6 @@ class _EditorScreenState extends State<EditorScreen> with AutomaticKeepAliveClie
           _code = savedCode;
           _language = savedLanguage ?? 'Python';
           _fileName = savedFileName ?? 'main';
-          _isInitialized = true;
         });
         return;
       }
@@ -126,7 +124,6 @@ class _EditorScreenState extends State<EditorScreen> with AutomaticKeepAliveClie
             if (lang.isNotEmpty) {
               _language = lang;
             }
-            _isInitialized = true;
           });
         }
       }
