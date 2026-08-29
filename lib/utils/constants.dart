@@ -77,6 +77,12 @@ class AppConstants {
       'refresh': 'Обновить список',
       'select_language_label': 'Выберите язык:',
       'share_code': 'Отправить код',
+      'chars': 'симв.',
+      'line': 'строк',
+      'code_ready': 'Напишите код здесь...',
+      'language_label': 'Язык:',
+      'privacy_title': 'Политика конфиденциальности',
+      'terms_title': 'Пользовательское соглашение',
       'about_description': 'Vorxy Code Editor — это мобильная среда разработки для устройств на базе Android. Приложение позволяет писать, редактировать, загружать и сохранять код на 10 языках программирования с подсветкой синтаксиса.',
       'about_full_text': 
         'Vorxy Code Editor — это мобильная среда разработки для устройств на базе Android. '
@@ -101,11 +107,6 @@ class AppConstants {
         '• Преподаватели программирования\n'
         '• Любители и энтузиасты\n\n'
         '© 2026 GOSTOWN Co. Все права защищена.',
-      'code_ready': 'Напишите код здесь...',
-      'language_label': 'Язык:',
-      'line': 'строк',
-      'privacy_title': 'Политика конфиденциальности',
-      'terms_title': 'Пользовательское соглашение',
     },
     'en': {
       'app_name': 'Vorxy Code Editor',
@@ -171,6 +172,12 @@ class AppConstants {
       'refresh': 'Refresh list',
       'select_language_label': 'Select language:',
       'share_code': 'Share code',
+      'chars': 'chars',
+      'line': 'lines',
+      'code_ready': 'Write your code here...',
+      'language_label': 'Language:',
+      'privacy_title': 'Privacy Policy',
+      'terms_title': 'Terms of Service',
       'about_description': 'Vorxy Code Editor is a mobile development environment for Android devices. The application allows you to write, edit, load and save code in 10 programming languages with syntax highlighting.',
       'about_full_text':
         'Vorxy Code Editor is a mobile development environment for Android devices. '
@@ -195,11 +202,6 @@ class AppConstants {
         '• Programming teachers\n'
         '• Hobbyists and enthusiasts\n\n'
         '© 2026 GOSTOWN Co. All rights reserved.',
-      'code_ready': 'Write your code here...',
-      'language_label': 'Language:',
-      'line': 'lines',
-      'privacy_title': 'Privacy Policy',
-      'terms_title': 'Terms of Service',
     },
   };
 
