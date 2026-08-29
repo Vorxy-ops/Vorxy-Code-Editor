@@ -96,6 +96,31 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
+  Future<void> _exitApp() async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(_getTranslation('exit_app')),
+        content: Text(_getTranslation('exit_app_confirm')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(_getTranslation('no')),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(_getTranslation('yes')),
+          ),
+        ],
+      ),
+    );
+
+    if (result == true) {
+      await Future.delayed(const Duration(milliseconds: 300));
+      exit(0);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -146,6 +171,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
               _getTranslation('terms_title'),
               AppConstants.getTerms(_currentLanguage),
             ),
+          ),
+          _buildIconTile(
+            icon: Icons.exit_to_app,
+            title: _getTranslation('exit'),
+            onTap: _exitApp,
           ),
           _buildSectionHeader(''),
           _buildInfoTile(),
