@@ -89,14 +89,14 @@ class _SplashScreenState extends State<SplashScreen> {
   Future<void> _checkPermissionsAndNavigate() async {
     final status = await Permission.manageExternalStorage.status;
     if (status.isGranted) {
-      await Future.delayed(const Duration(milliseconds: 500));
+      await Future.delayed(const Duration(milliseconds: 300));
       if (mounted) {
         Navigator.pushReplacementNamed(context, '/home');
       }
     } else {
       final newStatus = await Permission.manageExternalStorage.request();
       if (newStatus.isGranted) {
-        await Future.delayed(const Duration(milliseconds: 500));
+        await Future.delayed(const Duration(milliseconds: 300));
         if (mounted) {
           Navigator.pushReplacementNamed(context, '/home');
         }
