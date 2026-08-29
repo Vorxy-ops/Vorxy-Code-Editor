@@ -17,7 +17,7 @@ class EditorScreen extends StatefulWidget {
   State<EditorScreen> createState() => _EditorScreenState();
 }
 
-class _EditorScreenState extends State<EditorScreen> with AutomaticKeepAliveClientMixin {
+class _EditorScreenState extends State<EditorScreen> with AutomaticKeepAliveClientMixin, WidgetsBindingObserver {
   @override
   bool get wantKeepAlive => true;
 
@@ -26,11 +26,36 @@ class _EditorScreenState extends State<EditorScreen> with AutomaticKeepAliveClie
   String _fileName = 'main';
   bool _isLoading = false;
   bool _isSaving = false;
+  bool _isInitialized = false;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _loadLastFile();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _saveCodeState();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused || state == AppLifecycleState.detached) {
+      _saveCodeState();
+    }
+  }
+
+  Future<void> _saveCodeState() async {
+    if (_code.isNotEmpty) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('editor_code', _code);
+      await prefs.setString('editor_language', _language);
+      await prefs.setString('editor_filename', _fileName);
+    }
   }
 
   String _getExtension(String language) {
@@ -74,6 +99,20 @@ class _EditorScreenState extends State<EditorScreen> with AutomaticKeepAliveClie
     });
     try {
       final prefs = await SharedPreferences.getInstance();
+      final savedCode = prefs.getString('editor_code');
+      final savedLanguage = prefs.getString('editor_language');
+      final savedFileName = prefs.getString('editor_filename');
+
+      if (savedCode != null && savedCode.isNotEmpty) {
+        setState(() {
+          _code = savedCode;
+          _language = savedLanguage ?? 'Python';
+          _fileName = savedFileName ?? 'main';
+          _isInitialized = true;
+        });
+        return;
+      }
+
       final path = prefs.getString('lastFilePath');
       if (path != null) {
         final file = File(path);
@@ -87,6 +126,7 @@ class _EditorScreenState extends State<EditorScreen> with AutomaticKeepAliveClie
             if (lang.isNotEmpty) {
               _language = lang;
             }
+            _isInitialized = true;
           });
         }
       }
@@ -177,6 +217,7 @@ $_code
       });
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('lastFilePath', filePath);
+      await _saveCodeState();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -259,6 +300,7 @@ $_code
       });
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('lastFilePath', filePath);
+      await _saveCodeState();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -363,6 +405,7 @@ $_code
                       if (_language == 'HTML' && _code.isEmpty) {
                         _code = '<!DOCTYPE html>\n<html>\n<head>\n    <title>My Page</title>\n</head>\n<body>\n    <h1>Hello, World!</h1>\n</body>\n</html>';
                       }
+                      _saveCodeState();
                     });
                   },
                 ),
@@ -383,6 +426,7 @@ $_code
                               setState(() {
                                 _code = newCode;
                               });
+                              _saveCodeState();
                             },
                           ),
                         ],
