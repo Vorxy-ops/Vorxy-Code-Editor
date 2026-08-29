@@ -106,6 +106,13 @@ class _EditorScreenState extends State<EditorScreen> {
     }
   }
 
+  String _getCodeStats() {
+    final lines = _code.split('\n').length;
+    final chars = _code.replaceAll(' ', '').replaceAll('\n', '').length;
+    final lang = _language;
+    return '$lang, $lines ${_getTranslation('line')}, $chars ${_getTranslation('chars')}';
+  }
+
   Future<void> _shareCode() async {
     final String message = '''
 Vorxy Code Editor v${AppConstants.version}
@@ -116,8 +123,7 @@ Telegram-канал: ${AppConstants.telegramChannel}
 GitHub: ${AppConstants.githubRepo}
 Email: ${AppConstants.supportEmail}
 
-Код пользователя
-
+${_getCodeStats()}
 $_code
 ''';
 
@@ -388,15 +394,22 @@ $_code
             Expanded(
               child: _isLoading
                   ? const Center(child: CircularProgressIndicator())
-                  : CodeEditorWidget(
-                      code: _code,
-                      language: _language,
-                      currentLanguage: widget.currentLanguage,
-                      onCodeChanged: (newCode) {
-                        setState(() {
-                          _code = newCode;
-                        });
-                      },
+                  : SingleChildScrollView(
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: MediaQuery.of(context).size.height - 200,
+                        ),
+                        child: CodeEditorWidget(
+                          code: _code,
+                          language: _language,
+                          currentLanguage: widget.currentLanguage,
+                          onCodeChanged: (newCode) {
+                            setState(() {
+                              _code = newCode;
+                            });
+                          },
+                        ),
+                      ),
                     ),
             ),
           ],
