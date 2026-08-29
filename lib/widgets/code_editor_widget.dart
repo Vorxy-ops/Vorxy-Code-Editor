@@ -106,9 +106,9 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              _displayCode.isEmpty ? _getTranslation('code_ready') : '${_getTranslation('language_label')} ${widget.language}',
-              style: TextStyle(
-                color: _displayCode.isEmpty ? Colors.grey : AppTheme.accentGold,
+              '${_getTranslation('language_label')} ${widget.language}',
+              style: const TextStyle(
+                color: AppTheme.accentGold,
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
               ),
@@ -139,97 +139,101 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
         ),
         const SizedBox(height: 8),
         Expanded(
-          child: Container(
-            decoration: BoxDecoration(
-              color: isDark ? Colors.black : Colors.white,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: isDark ? Colors.grey.shade800 : Colors.grey.shade400),
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  width: _getLineNumberWidth(lines.length),
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  decoration: BoxDecoration(
-                    color: isDark ? Colors.grey.shade900 : Colors.grey.shade200,
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(8),
-                      bottomLeft: Radius.circular(8),
-                    ),
-                  ),
-                  child: ListView.builder(
-                    controller: _lineScrollController,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: lines.length,
-                    shrinkWrap: true,
-                    itemBuilder: (context, index) {
-                      return Container(
-                        height: 22,
-                        alignment: Alignment.centerRight,
-                        padding: const EdgeInsets.only(right: 8),
-                        child: Text(
-                          '${index + 1}',
-                          style: TextStyle(
-                            fontSize: _getNumberFontSize(lines.length),
-                            fontFamily: 'monospace',
-                            color: isDark ? Colors.grey.shade600 : Colors.grey.shade700,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      FocusScope.of(context).requestFocus(_focusNode);
-                    },
-                    child: SingleChildScrollView(
-                      controller: _scrollController,
-                      scrollDirection: Axis.horizontal,
-                      child: HighlightView(
-                        _displayCode.isEmpty ? _getTranslation('code_ready') : _displayCode,
-                        language: widget.language.toLowerCase(),
-                        theme: isDark ? _getDarkTheme() : _getLightTheme(),
-                        padding: const EdgeInsets.all(12),
-                        textStyle: TextStyle(
-                          fontSize: 14,
-                          fontFamily: 'monospace',
-                          color: isDark ? Colors.white : Colors.black,
-                        ),
+          child: GestureDetector(
+            onTap: () {
+              FocusScope.of(context).requestFocus(_focusNode);
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                color: isDark ? Colors.black : Colors.white,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: isDark ? Colors.grey.shade800 : Colors.grey.shade400),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: _getLineNumberWidth(lines.length),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    decoration: BoxDecoration(
+                      color: isDark ? Colors.grey.shade900 : Colors.grey.shade200,
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(8),
+                        bottomLeft: Radius.circular(8),
                       ),
                     ),
+                    child: ListView.builder(
+                      controller: _lineScrollController,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: lines.length,
+                      shrinkWrap: true,
+                      itemBuilder: (context, index) {
+                        return Container(
+                          height: 22,
+                          alignment: Alignment.centerRight,
+                          padding: const EdgeInsets.only(right: 8),
+                          child: Text(
+                            '${index + 1}',
+                            style: TextStyle(
+                              fontSize: _getNumberFontSize(lines.length),
+                              fontFamily: 'monospace',
+                              color: isDark ? Colors.grey.shade600 : Colors.grey.shade700,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
                   ),
-                ),
-              ],
+                  Expanded(
+                    child: Stack(
+                      children: [
+                        SingleChildScrollView(
+                          controller: _scrollController,
+                          scrollDirection: Axis.horizontal,
+                          child: HighlightView(
+                            _displayCode.isEmpty ? _getTranslation('code_ready') : _displayCode,
+                            language: widget.language.toLowerCase(),
+                            theme: isDark ? _getDarkTheme() : _getLightTheme(),
+                            padding: const EdgeInsets.all(12),
+                            textStyle: TextStyle(
+                              fontSize: 14,
+                              fontFamily: 'monospace',
+                              color: isDark ? Colors.white : Colors.black,
+                            ),
+                          ),
+                        ),
+                        Positioned.fill(
+                          child: TextField(
+                            controller: _controller,
+                            focusNode: _focusNode,
+                            maxLines: null,
+                            minLines: null,
+                            expands: true,
+                            style: TextStyle(
+                              color: Colors.transparent,
+                              fontSize: 14,
+                              fontFamily: 'monospace',
+                            ),
+                            decoration: const InputDecoration(
+                              border: InputBorder.none,
+                              filled: true,
+                              fillColor: Colors.transparent,
+                              hintStyle: TextStyle(color: Colors.transparent),
+                            ),
+                            onChanged: _onCodeChanged,
+                            onTap: () {
+                              setState(() {
+                                _cursorPosition = _controller.selection.baseOffset;
+                              });
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ),
-        const SizedBox(height: 8),
-        Container(
-          height: 0,
-          child: TextField(
-            controller: _controller,
-            focusNode: _focusNode,
-            maxLines: null,
-            expands: true,
-            style: TextStyle(
-              color: isDark ? Colors.white : Colors.black,
-              fontSize: 14,
-              fontFamily: 'monospace',
-            ),
-            decoration: InputDecoration(
-              border: InputBorder.none,
-              filled: true,
-              fillColor: Colors.transparent,
-            ),
-            onChanged: _onCodeChanged,
-            onTap: () {
-              setState(() {
-                _cursorPosition = _controller.selection.baseOffset;
-              });
-            },
           ),
         ),
       ],
