@@ -141,6 +141,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return Scaffold(
       appBar: AppBar(
         title: Text(_getTranslation('settings')),
@@ -157,22 +159,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _buildLanguageTile(),
           _buildSectionHeader(_getTranslation('about_app')),
           _buildAboutTile(),
-          _buildSectionHeader(_getTranslation('contacts')),
-          _buildIconTile(
-            icon: Icons.telegram,
-            title: _getTranslation('telegram_channel'),
-            onTap: () => _launchUrl(AppConstants.telegramChannel),
-          ),
-          _buildIconTile(
-            icon: Icons.chat,
-            title: _getTranslation('telegram_chat'),
-            onTap: () => _launchUrl(AppConstants.telegramChat),
-          ),
-          _buildIconTile(
-            icon: Icons.code,
-            title: _getTranslation('github'),
-            onTap: () => _launchUrl(AppConstants.githubRepo),
-          ),
+          _buildContactSection(),
           _buildSectionHeader(_getTranslation('support')),
           _buildIconTile(
             icon: Icons.bug_report,
@@ -181,19 +168,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           _buildSectionHeader(_getTranslation('legal')),
           _buildIconTile(
-            icon: Icons.privacy_tip,
-            title: _getTranslation('privacy_policy'),
-            onTap: () => _showLegalDialog(
-              _getTranslation('privacy_title'),
-              AppConstants.getPrivacyPolicy(_currentLanguage),
-            ),
-          ),
-          _buildIconTile(
             icon: Icons.gavel,
             title: _getTranslation('terms'),
             onTap: () => _showLegalDialog(
               _getTranslation('terms_title'),
               AppConstants.getTerms(_currentLanguage),
+            ),
+          ),
+          _buildIconTile(
+            icon: Icons.privacy_tip,
+            title: _getTranslation('privacy_policy'),
+            onTap: () => _showLegalDialog(
+              _getTranslation('privacy_title'),
+              AppConstants.getPrivacyPolicy(_currentLanguage),
             ),
           ),
           _buildIconTile(
@@ -272,6 +259,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
       trailing: const Icon(Icons.arrow_forward_ios, size: 16),
       onTap: () => _showAboutDialog(),
+    );
+  }
+
+  Widget _buildContactSection() {
+    return Column(
+      children: [
+        _buildIconTile(
+          icon: Icons.telegram,
+          title: _getTranslation('telegram_channel'),
+          onTap: () => _launchUrl(AppConstants.telegramChannel),
+        ),
+        _buildIconTile(
+          icon: Icons.chat,
+          title: _getTranslation('telegram_chat'),
+          onTap: () => _launchUrl(AppConstants.telegramChat),
+        ),
+        _buildIconTile(
+          icon: Icons.code,
+          title: _getTranslation('github'),
+          onTap: () => _launchUrl(AppConstants.githubRepo),
+        ),
+        _buildIconTile(
+          icon: Icons.email,
+          title: _getTranslation('email'),
+          onTap: _sendEmail,
+        ),
+      ],
     );
   }
 
@@ -386,6 +400,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 _getTranslation('about_full_text'),
                 style: const TextStyle(fontSize: 14, height: 1.6),
               ),
+              const SizedBox(height: 16),
+              Text(
+                _getTranslation('contacts'),
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.accentGold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              _buildContactItem(Icons.telegram, 'Telegram', AppConstants.telegramChannel),
+              _buildContactItem(Icons.chat, 'Telegram Chat', AppConstants.telegramChat),
+              _buildContactItem(Icons.code, 'GitHub', AppConstants.githubRepo),
+              _buildContactItem(Icons.email, 'Email', AppConstants.supportEmail),
             ],
           ),
         ),
@@ -395,6 +423,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: Text(_getTranslation('close')),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildContactItem(IconData icon, String label, String url) {
+    return InkWell(
+      onTap: () => _launchUrl(url),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Row(
+          children: [
+            Icon(icon, size: 20, color: AppTheme.accentGold),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                label,
+                style: const TextStyle(fontSize: 14),
+              ),
+            ),
+            const Icon(Icons.open_in_new, size: 16, color: Colors.grey),
+          ],
+        ),
       ),
     );
   }
