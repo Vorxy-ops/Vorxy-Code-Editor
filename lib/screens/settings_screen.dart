@@ -74,15 +74,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
     try {
       final Uri uri = Uri.parse(url);
       if (await canLaunchUrl(uri)) {
-        await launchUrl(uri, mode: LaunchMode.externalApplication);
+        await launchUrl(
+          uri,
+          mode: LaunchMode.externalApplication,
+        );
       } else {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('${_getTranslation('cannot_open_link')} $url'),
-              backgroundColor: Colors.orange,
-            ),
+        final Uri fallbackUri = Uri.parse(url);
+        if (await canLaunchUrl(fallbackUri)) {
+          await launchUrl(
+            fallbackUri,
+            mode: LaunchMode.platformDefault,
           );
+        } else {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('${_getTranslation('cannot_open_link')} $url'),
+                backgroundColor: Colors.orange,
+              ),
+            );
+          }
         }
       }
     } catch (e) {
@@ -105,15 +116,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
         query: 'subject=${Uri.encodeComponent(_getTranslation('bug_report_subject'))}&body=${Uri.encodeComponent(_getTranslation('bug_report_body'))}',
       );
       if (await canLaunchUrl(emailUri)) {
-        await launchUrl(emailUri, mode: LaunchMode.externalApplication);
+        await launchUrl(
+          emailUri,
+          mode: LaunchMode.externalApplication,
+        );
       } else {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(_getTranslation('email_error')),
-              backgroundColor: Colors.orange,
-            ),
+        final Uri fallbackUri = Uri(
+          scheme: 'mailto',
+          path: AppConstants.supportEmail,
+          query: 'subject=${Uri.encodeComponent(_getTranslation('bug_report_subject'))}&body=${Uri.encodeComponent(_getTranslation('bug_report_body'))}',
+        );
+        if (await canLaunchUrl(fallbackUri)) {
+          await launchUrl(
+            fallbackUri,
+            mode: LaunchMode.platformDefault,
           );
+        } else {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(_getTranslation('email_error')),
+                backgroundColor: Colors.orange,
+              ),
+            );
+          }
         }
       }
     } catch (e) {
