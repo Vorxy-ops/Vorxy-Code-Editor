@@ -106,14 +106,10 @@ class _EditorScreenState extends State<EditorScreen> {
     }
   }
 
-  String _getCodeStats() {
+  Future<void> _shareCode() async {
     final lines = _code.split('\n').length;
     final chars = _code.replaceAll(' ', '').replaceAll('\n', '').length;
-    final lang = _language;
-    return '$lang, $lines ${_getTranslation('line')}, $chars ${_getTranslation('chars')}';
-  }
-
-  Future<void> _shareCode() async {
+    
     final String message = '''
 Vorxy Code Editor v${AppConstants.version}
 developed by GOSTOWN Co.
@@ -123,7 +119,8 @@ Telegram-канал: ${AppConstants.telegramChannel}
 GitHub: ${AppConstants.githubRepo}
 Email: ${AppConstants.supportEmail}
 
-${_getCodeStats()}
+$_language
+$lines строк, $chars симв.
 $_code
 ''';
 
@@ -395,20 +392,19 @@ $_code
               child: _isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : SingleChildScrollView(
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(
-                          minHeight: MediaQuery.of(context).size.height - 200,
-                        ),
-                        child: CodeEditorWidget(
-                          code: _code,
-                          language: _language,
-                          currentLanguage: widget.currentLanguage,
-                          onCodeChanged: (newCode) {
-                            setState(() {
-                              _code = newCode;
-                            });
-                          },
-                        ),
+                      child: Column(
+                        children: [
+                          CodeEditorWidget(
+                            code: _code,
+                            language: _language,
+                            currentLanguage: widget.currentLanguage,
+                            onCodeChanged: (newCode) {
+                              setState(() {
+                                _code = newCode;
+                              });
+                            },
+                          ),
+                        ],
                       ),
                     ),
             ),
