@@ -38,7 +38,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   String _getTranslation(String key) {
-    final translations = AppConstants.translations[_currentLanguage] ?? AppConstants.translations['ru']!;
+    final translations = AppConstants.translations[_currentLanguage] ??
+        AppConstants.translations['ru']!;
     return translations[key] ?? key;
   }
 
@@ -156,7 +157,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _buildLanguageTile(),
           _buildSectionHeader(_getTranslation('about_app')),
           _buildAboutTile(),
-          _buildSectionHeader(_getTranslation('support')),
+          _buildSectionHeader(_getTranslation('contacts')),
           _buildIconTile(
             icon: Icons.telegram,
             title: _getTranslation('telegram_channel'),
@@ -167,6 +168,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
             title: _getTranslation('telegram_chat'),
             onTap: () => _launchUrl(AppConstants.telegramChat),
           ),
+          _buildIconTile(
+            icon: Icons.code,
+            title: _getTranslation('github'),
+            onTap: () => _launchUrl(AppConstants.githubRepo),
+          ),
+          _buildSectionHeader(_getTranslation('support')),
           _buildIconTile(
             icon: Icons.bug_report,
             title: _getTranslation('report_bug'),
