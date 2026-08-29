@@ -15,50 +15,56 @@ class FilesScreen extends StatefulWidget {
 }
 
 class _FilesScreenState extends State<FilesScreen> {
-  List<FileSystemEntity> _files = [];
-  String _currentPath = '';
+  List<File> _files = [];
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _loadFiles();
+    _loadSavedFiles();
   }
 
-  Future<void> _loadFiles() async {
+  Future<void> _loadSavedFiles() async {
+    setState(() {
+      _isLoading = true;
+    });
+
     try {
-      Directory dir;
-      if (_currentPath.isEmpty) {
-        final prefs = await SharedPreferences.getInstance();
-        final lastPath = prefs.getString('lastFilePath');
-        if (lastPath != null) {
-          final file = File(lastPath);
-          if (await file.exists()) {
-            dir = file.parent;
-          } else {
-            dir = await getApplicationDocumentsDirectory();
+      final prefs = await SharedPreferences.getInstance();
+      final lastPath = prefs.getString('lastFilePath');
+
+      if (lastPath != null) {
+        final dir = File(lastPath).parent;
+        if (await dir.exists()) {
+          final List<FileSystemEntity> entities = await dir.list().toList();
+          final List<File> savedFiles = [];
+          for (var entity in entities) {
+            if (entity is File) {
+              final name = entity.path.split('/').last;
+              final ext = name.split('.').last.toLowerCase();
+              if (['py', 'js', 'c', 'cpp', 'java', 'cs', 'vb', 'sql', 'r', 'rs', 'html', 'txt'].contains(ext)) {
+                savedFiles.add(entity);
+              }
+            }
           }
+          setState(() {
+            _files = savedFiles;
+            _isLoading = false;
+          });
         } else {
-          dir = await getApplicationDocumentsDirectory();
+          setState(() {
+            _isLoading = false;
+          });
         }
       } else {
-        dir = Directory(_currentPath);
+        setState(() {
+          _isLoading = false;
+        });
       }
-      
-      _currentPath = dir.path;
-      final List<FileSystemEntity> entities = await dir.list().toList();
-      entities.sort((a, b) {
-        if (a is Directory && b is File) return -1;
-        if (a is File && b is Directory) return 1;
-        return a.path.compareTo(b.path);
-      });
-      
-      setState(() {
-        _files = entities;
-      });
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${_getTranslation('error')}: $e')),
-      );
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -84,80 +90,83 @@ class _FilesScreenState extends State<FilesScreen> {
     }
   }
 
+  Future<void> _deleteFile(File file) async {
+    try {
+      await file.delete();
+      setState(() {
+        _files.remove(file);
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${_getTranslation('file_deleted')}: ${file.path.split('/').last}')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${_getTranslation('error')}: $e')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(_getTranslation('files')),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh, color: AppTheme.accentGold),
-            onPressed: _loadFiles,
-          ),
-        ],
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    _currentPath.isEmpty ? '/' : _currentPath,
-                    style: const TextStyle(
-                      color: Colors.grey,
-                      fontSize: 12,
-                    ),
-                    overflow: TextOverflow.ellipsis,
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _files.isEmpty
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.folder_open, size: 64, color: Colors.grey),
+                      const SizedBox(height: 16),
+                      Text(
+                        _getTranslation('no_files'),
+                        style: const TextStyle(fontSize: 16, color: Colors.grey),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        _getTranslation('save_files_to_view'),
+                        style: const TextStyle(fontSize: 12, color: Colors.grey),
+                      ),
+                    ],
                   ),
-                ),
-                if (_currentPath.isNotEmpty)
-                  IconButton(
-                    icon: const Icon(Icons.arrow_upward, color: AppTheme.accentGold),
-                    onPressed: () {
-                      final parent = Directory(_currentPath).parent;
-                      setState(() {
-                        _currentPath = parent.path;
-                      });
-                      _loadFiles();
-                    },
-                  ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: _files.length,
-              itemBuilder: (context, index) {
-                final entity = _files[index];
-                final isDirectory = entity is Directory;
-                final name = entity.path.split('/').last;
-                final isFile = entity is File;
-                
-                return ListTile(
-                  leading: Icon(
-                    isDirectory ? Icons.folder : Icons.insert_drive_file,
-                    color: isDirectory ? AppTheme.accentGold : Colors.grey,
-                  ),
-                  title: Text(name),
-                  subtitle: isFile ? Text('${(entity as File).lengthSync()} bytes') : null,
-                  onTap: () {
-                    if (isDirectory) {
-                      setState(() {
-                        _currentPath = entity.path;
-                      });
-                      _loadFiles();
-                    } else if (isFile) {
-                      _openFile(entity as File);
+                )
+              : ListView.builder(
+                  itemCount: _files.length,
+                  itemBuilder: (context, index) {
+                    final file = _files[index];
+                    final name = file.path.split('/').last;
+                    final size = file.lengthSync();
+                    String sizeStr;
+                    if (size < 1024) {
+                      sizeStr = '$size B';
+                    } else if (size < 1048576) {
+                      sizeStr = '${(size / 1024).toStringAsFixed(1)} KB';
+                    } else {
+                      sizeStr = '${(size / 1048576).toStringAsFixed(1)} MB';
                     }
+
+                    return Dismissible(
+                      key: Key(file.path),
+                      background: Container(
+                        color: Colors.red,
+                        alignment: Alignment.centerRight,
+                        padding: const EdgeInsets.only(right: 20),
+                        child: const Icon(Icons.delete, color: Colors.white),
+                      ),
+                      direction: DismissDirection.endToStart,
+                      onDismissed: (direction) => _deleteFile(file),
+                      child: ListTile(
+                        leading: const Icon(Icons.insert_drive_file, color: Colors.grey),
+                        title: Text(name),
+                        subtitle: Text(sizeStr),
+                        onTap: () => _openFile(file),
+                      ),
+                    );
                   },
-                );
-              },
-            ),
-          ),
-        ],
-      ),
+                ),
     );
   }
 }
