@@ -89,57 +89,68 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _checkPermissionsAndNavigate() async {
+    final status = await Permission.manageExternalStorage.status;
+    
+    if (status.isGranted) {
+      await _navigateToHome();
+    } else {
+      final result = await Permission.manageExternalStorage.request();
+      if (result.isGranted) {
+        await _navigateToHome();
+      } else {
+        // Если пользователь нажал "Назад" - выходим из приложения
+        if (mounted) {
+          await Future.delayed(const Duration(milliseconds: 200));
+          exit(0);
+        }
+      }
+    }
+  }
+
+  Future<void> _navigateToHome() async {
     if (_isNavigating) return;
     _isNavigating = true;
-
-    final status = await Permission.manageExternalStorage.status;
-    if (status.isGranted) {
-      await Future.delayed(const Duration(milliseconds: 300));
-      if (mounted) {
-        Navigator.pushReplacementNamed(context, '/home');
-      }
-    } else {
-      final newStatus = await Permission.manageExternalStorage.request();
-      if (newStatus.isGranted) {
-        await Future.delayed(const Duration(milliseconds: 300));
-        if (mounted) {
-          Navigator.pushReplacementNamed(context, '/home');
-        }
-      } else {
-        _isNavigating = false;
-        _checkPermissionsAndNavigate();
-      }
+    
+    await Future.delayed(const Duration(milliseconds: 400));
+    if (mounted) {
+      Navigator.pushReplacementNamed(context, '/home');
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF1A0B2E),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Vorxy Code Editor',
-              style: const TextStyle(
-                color: Color(0xFFFFEB3B),
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-                fontFamily: 'sans-serif',
+    return WillPopScope(
+      onWillPop: () async {
+        exit(0);
+        return false;
+      },
+      child: Scaffold(
+        backgroundColor: const Color(0xFF1A0B2E),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'Vorxy Code Editor',
+                style: const TextStyle(
+                  color: Color(0xFFFFEB3B),
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'sans-serif',
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'developed by GOSTOWN Co.',
-              style: const TextStyle(
-                color: Color(0xFFFFEB3B),
-                fontSize: 16,
-                fontWeight: FontWeight.normal,
-                fontFamily: 'Montserrat',
+              const SizedBox(height: 8),
+              Text(
+                'developed by GOSTOWN Co.',
+                style: const TextStyle(
+                  color: Color(0xFFFFEB3B),
+                  fontSize: 16,
+                  fontWeight: FontWeight.normal,
+                  fontFamily: 'Montserrat',
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
