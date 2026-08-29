@@ -43,13 +43,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return translations[key] ?? key;
   }
 
-  Future<void> _toggleTheme(bool value) async {
+  Future<void> _toggleTheme() async {
     setState(() {
-      _isDarkMode = value;
+      _isDarkMode = !_isDarkMode;
     });
-    widget.onThemeChanged(value);
+    widget.onThemeChanged(_isDarkMode);
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('darkMode', value);
+    await prefs.setBool('darkMode', _isDarkMode);
   }
 
   Future<void> _changeLanguage(String langCode) async {
@@ -62,7 +62,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('${_getTranslation('language_changed')} ${langCode == 'ru' ? 'Русский' : 'English'}'),
+          content: Text('${_getTranslation('language_changed')} ${langCode == 'ru' ? 'RUS' : 'ENG'}'),
         ),
       );
     }
@@ -71,7 +71,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _launchUrl(String url) async {
     try {
       final uri = Uri.parse(url);
-      
       if (await canLaunchUrl(uri)) {
         await launchUrl(
           uri,
@@ -106,7 +105,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
         path: AppConstants.supportEmail,
         query: 'subject=${Uri.encodeComponent(_getTranslation('bug_report_subject'))}&body=${Uri.encodeComponent(_getTranslation('bug_report_body'))}',
       );
-      
       if (await canLaunchUrl(email)) {
         await launchUrl(
           email,
@@ -152,7 +150,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ],
       ),
     );
-
     if (result == true) {
       await Future.delayed(const Duration(milliseconds: 300));
       exit(0);
@@ -168,12 +165,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       body: ListView(
         children: [
           _buildSectionHeader(_getTranslation('general')),
-          _buildSwitchTile(
-            icon: Icons.dark_mode,
-            title: _getTranslation('dark_theme'),
-            value: _isDarkMode,
-            onChanged: _toggleTheme,
-          ),
+          _buildThemeTile(),
           _buildLanguageTile(),
           _buildSectionHeader(_getTranslation('about_app')),
           _buildAboutTile(),
@@ -242,17 +234,58 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _buildSwitchTile({
-    required IconData icon,
-    required String title,
-    required bool value,
-    required ValueChanged<bool> onChanged,
-  }) {
-    return SwitchListTile(
-      secondary: Icon(icon, color: AppTheme.accentGold),
-      title: Text(title),
-      value: value,
-      onChanged: onChanged,
+  Widget _buildThemeTile() {
+    return ListTile(
+      leading: const Icon(Icons.palette, color: AppTheme.accentGold),
+      title: Text(_getTranslation('theme')),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          InkWell(
+            onTap: () {
+              if (_isDarkMode) return;
+              _toggleTheme();
+            },
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: _isDarkMode ? AppTheme.accentGold : Colors.transparent,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: _isDarkMode ? AppTheme.accentGold : Colors.grey,
+                ),
+              ),
+              child: Icon(
+                Icons.nightlight_round,
+                color: _isDarkMode ? Colors.black : Colors.grey,
+                size: 24,
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          InkWell(
+            onTap: () {
+              if (!_isDarkMode) return;
+              _toggleTheme();
+            },
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: !_isDarkMode ? AppTheme.accentGold : Colors.transparent,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: !_isDarkMode ? AppTheme.accentGold : Colors.grey,
+                ),
+              ),
+              child: Icon(
+                Icons.wb_sunny,
+                color: !_isDarkMode ? Colors.black : Colors.grey,
+                size: 24,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -261,7 +294,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
       leading: const Icon(Icons.language, color: AppTheme.accentGold),
       title: Text(_getTranslation('language')),
       subtitle: Text(
-        _currentLanguage == 'ru' ? 'Русский' : 'English',
+        _currentLanguage == 'ru' ? 'RUS' : 'ENG',
+        style: TextStyle(
+          color: AppTheme.accentGold,
+          fontWeight: FontWeight.bold,
+        ),
       ),
       trailing: const Icon(Icons.arrow_forward_ios, size: 16),
       onTap: () => _showLanguageDialog(),
@@ -328,7 +365,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              leading: const Text('🇷🇺'),
+              leading: Text(
+                'RUS',
+                style: TextStyle(
+                  color: AppTheme.accentGold,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               title: const Text('Русский'),
               onTap: () {
                 Navigator.pop(context);
@@ -336,7 +379,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
               },
             ),
             ListTile(
-              leading: const Text('🇬🇧'),
+              leading: Text(
+                'ENG',
+                style: TextStyle(
+                  color: AppTheme.accentGold,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               title: const Text('English'),
               onTap: () {
                 Navigator.pop(context);
