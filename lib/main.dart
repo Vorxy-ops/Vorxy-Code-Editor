@@ -98,7 +98,6 @@ class _SplashScreenState extends State<SplashScreen> {
       if (result.isGranted) {
         await _navigateToHome();
       } else {
-        // Если пользователь нажал "Назад" - выходим из приложения
         if (mounted) {
           await Future.delayed(const Duration(milliseconds: 200));
           exit(0);
