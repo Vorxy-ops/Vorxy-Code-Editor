@@ -20,6 +20,8 @@ class _EditorScreenState extends State<EditorScreen> {
   String _code = '';
   String _language = 'Python';
   String _fileName = 'main';
+  bool _isLoading = false;
+  bool _isSaving = false;
 
   @override
   void initState() {
@@ -61,12 +63,12 @@ class _EditorScreenState extends State<EditorScreen> {
     }
   }
 
-  bool _isSupportedExtension(String extension) {
-    final supported = ['.py', '.js', '.c', '.cpp', '.java', '.cs', '.vb', '.sql', '.r', '.rs', '.html'];
-    return supported.contains(extension.toLowerCase());
-  }
-
   Future<void> _loadLastFile() async {
+    if (_isLoading) return;
+    setState(() {
+      _isLoading = true;
+    });
+
     try {
       final prefs = await SharedPreferences.getInstance();
       final path = prefs.getString('lastFilePath');
@@ -85,10 +87,27 @@ class _EditorScreenState extends State<EditorScreen> {
           });
         }
       }
-    } catch (e) {}
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${_getTranslation('error_loading_file')} $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   Future<void> _openFile() async {
+    if (_isLoading) return;
+    
     try {
       final result = await FilePicker.platform.pickFiles(
         allowMultiple: false,
@@ -101,15 +120,27 @@ class _EditorScreenState extends State<EditorScreen> {
       final filePath = result.files.single.path;
       if (filePath == null) return;
 
+      setState(() {
+        _isLoading = true;
+      });
+
       final file = File(filePath);
       final content = await file.readAsString();
       final ext = filePath.split('.').last;
       final lang = _getLanguageFromExtension('.$ext');
 
       if (lang.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(_getTranslation('unsupported_extension'))),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(_getTranslation('unsupported_extension')),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        }
+        setState(() {
+          _isLoading = false;
+        });
         return;
       }
 
@@ -122,17 +153,35 @@ class _EditorScreenState extends State<EditorScreen> {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('lastFilePath', filePath);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${_getTranslation('file_loaded')}: ${filePath.split('/').last}')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${_getTranslation('file_loaded')}: ${filePath.split('/').last}'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${_getTranslation('error')}: ${_getTranslation('error_loading_file')} $e')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${_getTranslation('error')}: ${_getTranslation('error_loading_file')} $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
   Future<void> _saveFile() async {
+    if (_isSaving) return;
+    
     try {
       String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
       if (selectedDirectory == null) return;
@@ -164,13 +213,25 @@ class _EditorScreenState extends State<EditorScreen> {
 
       if (result == null || result.isEmpty) return;
 
+      setState(() {
+        _isSaving = true;
+      });
+
       final fileName = result + _getExtension(_language);
       final filePath = '$selectedDirectory/$fileName';
 
       if (await File(filePath).exists()) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(_getTranslation('file_exists'))),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(_getTranslation('file_exists')),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        }
+        setState(() {
+          _isSaving = false;
+        });
         return;
       }
 
@@ -184,19 +245,34 @@ class _EditorScreenState extends State<EditorScreen> {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('lastFilePath', filePath);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${_getTranslation('file_saved')}: $fileName')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${_getTranslation('file_saved')}: $fileName'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${_getTranslation('error')}: $e')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${_getTranslation('error')}: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSaving = false;
+        });
+      }
     }
   }
 
   String _getTranslation(String key) {
-    final translations = AppConstants.translations[widget.currentLanguage] ??
-        AppConstants.translations['ru']!;
+    final translations = AppConstants.translations[widget.currentLanguage] ?? AppConstants.translations['ru']!;
     return translations[key] ?? key;
   }
 
@@ -207,12 +283,16 @@ class _EditorScreenState extends State<EditorScreen> {
         title: Text(_getTranslation('editor')),
         actions: [
           IconButton(
-            icon: const Icon(Icons.folder_open, color: AppTheme.accentGold),
-            onPressed: _openFile,
+            icon: _isLoading 
+              ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
+              : const Icon(Icons.folder_open, color: AppTheme.accentGold),
+            onPressed: _isLoading ? null : _openFile,
           ),
           IconButton(
-            icon: const Icon(Icons.save, color: AppTheme.accentGold),
-            onPressed: _saveFile,
+            icon: _isSaving
+              ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
+              : const Icon(Icons.save, color: AppTheme.accentGold),
+            onPressed: _isSaving ? null : _saveFile,
           ),
         ],
       ),
@@ -256,22 +336,24 @@ class _EditorScreenState extends State<EditorScreen> {
             ),
             const SizedBox(height: 8),
             Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    CodeEditorWidget(
-                      code: _code,
-                      language: _language,
-                      currentLanguage: widget.currentLanguage,
-                      onCodeChanged: (newCode) {
-                        setState(() {
-                          _code = newCode;
-                        });
-                      },
+              child: _isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          CodeEditorWidget(
+                            code: _code,
+                            language: _language,
+                            currentLanguage: widget.currentLanguage,
+                            onCodeChanged: (newCode) {
+                              setState(() {
+                                _code = newCode;
+                              });
+                            },
+                          ),
+                        ],
+                      ),
                     ),
-                  ],
-                ),
-              ),
             ),
           ],
         ),
