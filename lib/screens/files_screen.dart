@@ -310,7 +310,12 @@ class _FilesScreenState extends State<FilesScreen> {
                         children: [
                           TextButton(
                             onPressed: _toggleSelectionMode,
-                            child: Text(_getTranslation('cancel')),
+                            child: Text(
+                              _getTranslation('cancel'),
+                              style: TextStyle(
+                                color: isDark ? Colors.white : Colors.black,
+                              ),
+                            ),
                           ),
                           const SizedBox(width: 8),
                           ElevatedButton(
