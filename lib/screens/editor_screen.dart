@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../widgets/code_editor_widget.dart';
 import '../utils/theme.dart';
 import '../utils/constants.dart';
@@ -19,12 +20,23 @@ class EditorScreen extends StatefulWidget {
 class _EditorScreenState extends State<EditorScreen> {
   String _code = '';
   String _language = 'Python';
-  String _currentFile = 'main.py';
+  String _fileName = 'main';
+  bool _hasPermission = false;
 
   @override
   void initState() {
     super.initState();
-    _loadLastFile();
+    _requestPermission();
+  }
+
+  Future<void> _requestPermission() async {
+    final status = await Permission.manageExternalStorage.request();
+    setState(() {
+      _hasPermission = status.isGranted;
+    });
+    if (_hasPermission) {
+      _loadLastFile();
+    }
   }
 
   String _getExtension(String language) {
@@ -54,7 +66,7 @@ class _EditorScreenState extends State<EditorScreen> {
           final content = await file.readAsString();
           setState(() {
             _code = content;
-            _currentFile = path.split('/').last;
+            _fileName = path.split('/').last.split('.').first;
           });
         }
       }
@@ -62,18 +74,59 @@ class _EditorScreenState extends State<EditorScreen> {
   }
 
   Future<void> _saveFile() async {
+    if (!_hasPermission) {
+      await _requestPermission();
+      if (!_hasPermission) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${_getTranslation('error')}: ${_getTranslation('permission_denied')}')),
+        );
+        return;
+      }
+    }
+
     try {
       String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
       if (selectedDirectory == null) return;
-      final fileName = _currentFile.isEmpty ? 'main${_getExtension(_language)}' : _currentFile;
+
+      final TextEditingController nameController = TextEditingController(text: _fileName);
+      final result = await showDialog<String>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text(_getTranslation('save_file')),
+          content: TextField(
+            controller: nameController,
+            decoration: InputDecoration(
+              hintText: _getTranslation('enter_file_name'),
+              suffixText: _getExtension(_language),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(_getTranslation('cancel')),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, nameController.text),
+              child: Text(_getTranslation('save')),
+            ),
+          ],
+        ),
+      );
+
+      if (result == null || result.isEmpty) return;
+
+      final fileName = result + _getExtension(_language);
       final filePath = '$selectedDirectory/$fileName';
       final file = File(filePath);
       await file.writeAsString(_code);
+
       setState(() {
-        _currentFile = fileName;
+        _fileName = result;
       });
+
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('lastFilePath', filePath);
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('${_getTranslation('file_saved')}: $fileName')),
       );
@@ -91,9 +144,35 @@ class _EditorScreenState extends State<EditorScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (!_hasPermission) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(_getTranslation('editor')),
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.folder_open, size: 64, color: Colors.grey),
+              const SizedBox(height: 16),
+              Text(
+                _getTranslation('permission_required'),
+                style: const TextStyle(fontSize: 16),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: _requestPermission,
+                child: Text(_getTranslation('grant_permission')),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(_currentFile.isEmpty ? '${_getTranslation('editor')} (${_getTranslation('code_ready')})' : _currentFile),
+        title: Text(_getTranslation('editor')),
         actions: [
           IconButton(
             icon: const Icon(Icons.save, color: AppTheme.accentGold),
@@ -132,7 +211,6 @@ class _EditorScreenState extends State<EditorScreen> {
                       if (_language == 'HTML' && _code.isEmpty) {
                         _code = '<!DOCTYPE html>\n<html>\n<head>\n    <title>My Page</title>\n</head>\n<body>\n    <h1>Hello, World!</h1>\n</body>\n</html>';
                       }
-                      _currentFile = 'main${_getExtension(_language)}';
                     });
                   },
                 ),
