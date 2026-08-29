@@ -44,6 +44,18 @@ class AppConstants {
       'close': 'Закрыть',
       'general': 'Общие',
       'about_app': 'О приложении',
+      'permission_denied': 'Доступ к файлам запрещён',
+      'permission_required': 'Требуется доступ к файлам и папкам',
+      'grant_permission': 'Предоставить доступ',
+      'save_file': 'Сохранить файл',
+      'enter_file_name': 'Введите имя файла',
+      'cancel': 'Отмена',
+      'file_deleted': 'Файл удалён',
+      'no_files': 'Нет сохранённых файлов',
+      'save_files_to_view': 'Сохраните файл в редакторе, чтобы он появился здесь',
+      'bug_report_subject': 'Сообщение об ошибке в Vorxy Code Editor',
+      'bug_report_body': 'Опишите ошибку подробно:',
+      'email_error': 'Не удалось открыть почтовое приложение',
       'about_full_text': 
         'Vorxy Code Editor — это мобильная среда разработки для устройств на базе Android. '
         'Приложение позволяет писать, редактировать и сохранять код на 10 языках программирования '
@@ -111,6 +123,18 @@ class AppConstants {
       'close': 'Close',
       'general': 'General',
       'about_app': 'About',
+      'permission_denied': 'File access denied',
+      'permission_required': 'File and folder access required',
+      'grant_permission': 'Grant permission',
+      'save_file': 'Save file',
+      'enter_file_name': 'Enter file name',
+      'cancel': 'Cancel',
+      'file_deleted': 'File deleted',
+      'no_files': 'No saved files',
+      'save_files_to_view': 'Save a file in the editor to see it here',
+      'bug_report_subject': 'Bug report for Vorxy Code Editor',
+      'bug_report_body': 'Describe the bug in detail:',
+      'email_error': 'Unable to open email app',
       'about_full_text':
         'Vorxy Code Editor is a mobile development environment for Android devices. '
         'The application allows you to write, edit and save code in 10 programming '
