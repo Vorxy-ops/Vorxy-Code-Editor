@@ -1,12 +1,12 @@
 # Vorxy Code Editor
 
-Mobile development environment for creating and editing code in 10 programming languages.
+Mobile development environment for creating, editing, loading and saving code in 10 programming languages.
 
 ---
 
 ## About
 
-Vorxy Code Editor is a mobile development environment for Android devices. The application allows you to write, edit and save code in 10 programming languages with syntax highlighting.
+Vorxy Code Editor is a mobile development environment for Android devices. The application allows you to write, edit, load and save code in 10 programming languages with syntax highlighting.
 
 The application is designed for programmers, students and anyone who wants to have access to their code anytime, anywhere.
 
@@ -24,6 +24,18 @@ The application is designed for programmers, students and anyone who wants to ha
 - SQL
 - R
 - Rust
+
+---
+
+## Features
+
+- Syntax highlighting for 10 programming languages
+- Load and save files from device
+- Auto-detection of language by file extension
+- Dark/Light theme
+- Multiple language interface (Русский, English)
+- File management (delete, select multiple, delete all)
+- Send bug reports via email
 
 ---
 
@@ -47,6 +59,7 @@ The application is designed for programmers, students and anyone who wants to ha
 
 - Telegram channel: https://t.me/VorxyCodeEditor
 - Telegram chat: https://t.me/VorxyCodeEditorChat
+- GitHub: https://github.com/Vorxy-ops/Vorxy-Code-Editor.git
 - Email: vorxygtn@mail.ru
 
 ---
