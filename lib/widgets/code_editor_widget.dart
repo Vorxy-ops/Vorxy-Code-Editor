@@ -153,65 +153,67 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
           ],
         ),
         const SizedBox(height: 8),
-        Container(
-          decoration: BoxDecoration(
-            color: isDark ? Colors.black : Colors.white,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: isDark ? Colors.grey.shade800 : Colors.grey.shade400),
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: _getLineNumberWidth(lines.length),
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                decoration: BoxDecoration(
-                  color: isDark ? Colors.grey.shade900 : Colors.grey.shade200,
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(8),
-                    bottomLeft: Radius.circular(8),
+        Expanded(
+          child: Container(
+            decoration: BoxDecoration(
+              color: isDark ? Colors.black : Colors.white,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: isDark ? Colors.grey.shade800 : Colors.grey.shade400),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: _getLineNumberWidth(lines.length),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  decoration: BoxDecoration(
+                    color: isDark ? Colors.grey.shade900 : Colors.grey.shade200,
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(8),
+                      bottomLeft: Radius.circular(8),
+                    ),
+                  ),
+                  child: ListView.builder(
+                    controller: _lineScrollController,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: lines.length,
+                    shrinkWrap: true,
+                    itemBuilder: (context, index) {
+                      return Container(
+                        height: 22,
+                        alignment: Alignment.centerRight,
+                        padding: const EdgeInsets.only(right: 8),
+                        child: Text(
+                          '${index + 1}',
+                          style: TextStyle(
+                            fontSize: _getNumberFontSize(lines.length),
+                            fontFamily: 'monospace',
+                            color: isDark ? Colors.grey.shade600 : Colors.grey.shade700,
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ),
-                child: ListView.builder(
-                  controller: _lineScrollController,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: lines.length,
-                  shrinkWrap: true,
-                  itemBuilder: (context, index) {
-                    return Container(
-                      height: 22,
-                      alignment: Alignment.centerRight,
-                      padding: const EdgeInsets.only(right: 8),
-                      child: Text(
-                        '${index + 1}',
-                        style: TextStyle(
-                          fontSize: _getNumberFontSize(lines.length),
-                          fontFamily: 'monospace',
-                          color: isDark ? Colors.grey.shade600 : Colors.grey.shade700,
-                        ),
+                Expanded(
+                  child: SingleChildScrollView(
+                    controller: _scrollController,
+                    scrollDirection: Axis.horizontal,
+                    child: HighlightView(
+                      _displayCode.isEmpty ? ' ' : _displayCode,
+                      language: widget.language.toLowerCase(),
+                      theme: isDark ? _getDarkTheme() : _getLightTheme(),
+                      padding: const EdgeInsets.all(12),
+                      textStyle: TextStyle(
+                        fontSize: 14,
+                        fontFamily: 'monospace',
+                        color: isDark ? Colors.white : Colors.black,
                       ),
-                    );
-                  },
-                ),
-              ),
-              Expanded(
-                child: SingleChildScrollView(
-                  controller: _scrollController,
-                  scrollDirection: Axis.horizontal,
-                  child: HighlightView(
-                    _displayCode.isEmpty ? ' ' : _displayCode,
-                    language: widget.language.toLowerCase(),
-                    theme: isDark ? _getDarkTheme() : _getLightTheme(),
-                    padding: const EdgeInsets.all(12),
-                    textStyle: TextStyle(
-                      fontSize: 14,
-                      fontFamily: 'monospace',
-                      color: isDark ? Colors.white : Colors.black,
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
         const SizedBox(height: 8),
