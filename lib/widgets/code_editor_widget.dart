@@ -41,13 +41,6 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
     super.initState();
     _controller = TextEditingController(text: widget.code);
     _displayCode = widget.code;
-    
-    _scrollController.addListener(() {
-      if (_lineScrollController.hasClients) {
-        _lineScrollController.jumpTo(_scrollController.offset);
-      }
-    });
-
     _controller.addListener(() {
       setState(() {
         _cursorPosition = _controller.selection.baseOffset;
@@ -68,14 +61,11 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
   void _onCodeChanged(String value) {
     if (_isProcessing) return;
     _isProcessing = true;
-    
     setState(() {
       _displayCode = value;
       _cursorPosition = _controller.selection.baseOffset;
     });
-    
     widget.onCodeChanged(value);
-    
     Future.delayed(const Duration(milliseconds: 50), () {
       _isProcessing = false;
     });
@@ -89,12 +79,10 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
   String _getLineAndColumn(String text, int position) {
     if (position < 0) position = 0;
     if (position > text.length) position = text.length;
-    
     final String beforeCursor = text.substring(0, position);
     final int line = beforeCursor.split('\n').length;
     final int lastNewLine = beforeCursor.lastIndexOf('\n');
     final int column = lastNewLine == -1 ? beforeCursor.length + 1 : beforeCursor.length - lastNewLine;
-    
     return 'Ln $line, Col $column';
   }
 
@@ -110,7 +98,7 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
     final lines = _getLines(_displayCode);
     final lineAndCol = _getLineAndColumn(_displayCode, _cursorPosition);
     final stats = _getStats(_displayCode);
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -118,9 +106,9 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              '${_getTranslation('language_label')} ${widget.language}',
-              style: const TextStyle(
-                color: AppTheme.accentGold,
+              _displayCode.isEmpty ? _getTranslation('code_ready') : '${_getTranslation('language_label')} ${widget.language}',
+              style: TextStyle(
+                color: _displayCode.isEmpty ? Colors.grey : AppTheme.accentGold,
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
               ),
@@ -128,10 +116,7 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
             const Spacer(),
             Text(
               lineAndCol,
-              style: const TextStyle(
-                color: Colors.grey,
-                fontSize: 12,
-              ),
+              style: const TextStyle(color: Colors.grey, fontSize: 12),
             ),
           ],
         ),
@@ -196,18 +181,23 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
                   ),
                 ),
                 Expanded(
-                  child: SingleChildScrollView(
-                    controller: _scrollController,
-                    scrollDirection: Axis.horizontal,
-                    child: HighlightView(
-                      _displayCode.isEmpty ? ' ' : _displayCode,
-                      language: widget.language.toLowerCase(),
-                      theme: isDark ? _getDarkTheme() : _getLightTheme(),
-                      padding: const EdgeInsets.all(12),
-                      textStyle: TextStyle(
-                        fontSize: 14,
-                        fontFamily: 'monospace',
-                        color: isDark ? Colors.white : Colors.black,
+                  child: GestureDetector(
+                    onTap: () {
+                      FocusScope.of(context).requestFocus(_focusNode);
+                    },
+                    child: SingleChildScrollView(
+                      controller: _scrollController,
+                      scrollDirection: Axis.horizontal,
+                      child: HighlightView(
+                        _displayCode.isEmpty ? _getTranslation('code_ready') : _displayCode,
+                        language: widget.language.toLowerCase(),
+                        theme: isDark ? _getDarkTheme() : _getLightTheme(),
+                        padding: const EdgeInsets.all(12),
+                        textStyle: TextStyle(
+                          fontSize: 14,
+                          fontFamily: 'monospace',
+                          color: isDark ? Colors.white : Colors.black,
+                        ),
                       ),
                     ),
                   ),
@@ -217,12 +207,12 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
           ),
         ),
         const SizedBox(height: 8),
-        Expanded(
+        Container(
+          height: 0,
           child: TextField(
             controller: _controller,
             focusNode: _focusNode,
             maxLines: null,
-            minLines: 10,
             expands: true,
             style: TextStyle(
               color: isDark ? Colors.white : Colors.black,
@@ -230,28 +220,9 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
               fontFamily: 'monospace',
             ),
             decoration: InputDecoration(
-              hintText: _getTranslation('code_ready'),
-              hintStyle: TextStyle(
-                color: isDark ? Colors.grey : Colors.grey.shade600,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(
-                  color: isDark ? Colors.grey : Colors.grey.shade400,
-                ),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(
-                  color: isDark ? Colors.grey : Colors.grey.shade400,
-                ),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: AppTheme.accentGold),
-              ),
+              border: InputBorder.none,
               filled: true,
-              fillColor: isDark ? Colors.black : Colors.white,
+              fillColor: Colors.transparent,
             ),
             onChanged: _onCodeChanged,
             onTap: () {
