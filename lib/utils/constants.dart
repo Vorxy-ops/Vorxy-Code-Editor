@@ -1,9 +1,10 @@
 class AppConstants {
   static const String appName = 'Vorxy Code Editor';
-  static const String version = '3.3.2';
+  static const String version = '3.3.5';
   static const String developer = 'GOSTOWN Co.';
   static const String telegramChannel = 'https://t.me/VorxyCodeEditor';
   static const String telegramChat = 'https://t.me/VorxyCodeEditorChat';
+  static const String githubRepo = 'https://github.com/Vorxy-ops/Vorxy-Code-Editor.git';
   static const String supportEmail = 'vorxygtn@mail.ru';
 
   static const List<Map<String, String>> supportedLanguages = [
@@ -22,8 +23,10 @@ class AppConstants {
       'light_theme': 'Светлая тема',
       'auto_save': 'Автосохранение',
       'support': 'Поддержка',
+      'contacts': 'Контакты',
       'telegram_channel': 'Telegram-канал',
       'telegram_chat': 'Чат Telegram',
+      'github': 'GitHub',
       'report_bug': 'Сообщить об ошибке',
       'legal': 'Юридическая информация',
       'privacy_policy': 'Политика конфиденциальности',
@@ -58,15 +61,29 @@ class AppConstants {
       'cancel': 'Отмена',
       'file_deleted': 'Файл удалён',
       'no_files': 'Нет сохранённых файлов',
-      'save_files_to_view': 'Сохраните файл в редакторе, чтобы он появился здесь',
+      'save_files_to_view': 'Сохраните или загрузите файл, чтобы он появился здесь',
       'bug_report_subject': 'Сообщение об ошибке в Vorxy Code Editor',
       'bug_report_body': 'Опишите ошибку подробно:',
       'email_error': 'Не удалось открыть почтовое приложение',
       'cannot_open_link': 'Не удалось открыть ссылку:',
       'error_loading_file': 'Ошибка загрузки файла:',
+      'file_exists': 'Файл со схожим названием уже существует. Переименуйте файл.',
+      'delete_file': 'Удалить файл',
+      'delete_files': 'Удалить файл(ы)',
+      'delete_confirm': 'Вы действительно хотите удалить файл',
+      'delete_files_confirm': 'Вы действительно хотите удалить файл(ы)',
+      'delete_note': '(примечание: данный(е) файл(ы) будет(ут) удален(ы) из списка файлов приложения и устройства)',
+      'delete_all': 'Удалить все файлы',
+      'delete_all_confirm': 'Вы действительно хотите удалить все файлы',
+      'delete_all_note': '(примечание: все файлы будут удалены из списка файлов приложения и устройства)',
+      'select_files': 'Выбрать файлы для удаления',
+      'delete_selected': 'Удалить выбранные',
+      'refresh': 'Обновить список',
+      'select_language_label': 'Выберите язык:',
+      'about_description': 'Vorxy Code Editor — это мобильная среда разработки для устройств на базе Android. Приложение позволяет писать, редактировать, загружать и сохранять код на 10 языках программирования с подсветкой синтаксиса.',
       'about_full_text': 
         'Vorxy Code Editor — это мобильная среда разработки для устройств на базе Android. '
-        'Приложение позволяет писать, редактировать и сохранять код на 10 языках программирования '
+        'Приложение позволяет писать, редактировать, загружать и сохранять код на 10 языках программирования '
         'с подсветкой синтаксиса.\n\n'
         'Приложение разработано для программистов, студентов и всех, кто хочет иметь доступ к '
         'своему коду в любое время и в любом месте.\n\n'
@@ -86,7 +103,7 @@ class AppConstants {
         '• Студенты IT-специальностей\n'
         '• Преподаватели программирования\n'
         '• Любители и энтузиасты\n\n'
-        '© 2026 GOSTOWN Co. Все права защищены.',
+        '© 2026 GOSTOWN Co. Все права защищена.',
       'description': 
         'Мобильная среда разработки для создания и редактирования кода на 10 языках программирования.',
       'system_requirements': 'Системные требования',
@@ -109,8 +126,10 @@ class AppConstants {
       'light_theme': 'Light Theme',
       'auto_save': 'Auto Save',
       'support': 'Support',
+      'contacts': 'Contacts',
       'telegram_channel': 'Telegram Channel',
       'telegram_chat': 'Telegram Chat',
+      'github': 'GitHub',
       'report_bug': 'Report Bug',
       'legal': 'Legal Information',
       'privacy_policy': 'Privacy Policy',
@@ -145,15 +164,29 @@ class AppConstants {
       'cancel': 'Cancel',
       'file_deleted': 'File deleted',
       'no_files': 'No saved files',
-      'save_files_to_view': 'Save a file in the editor to see it here',
+      'save_files_to_view': 'Save or load a file to see it here',
       'bug_report_subject': 'Bug report for Vorxy Code Editor',
       'bug_report_body': 'Describe the bug in detail:',
       'email_error': 'Unable to open email app',
       'cannot_open_link': 'Unable to open link:',
       'error_loading_file': 'Error loading file:',
+      'file_exists': 'A file with a similar name already exists. Please rename the file.',
+      'delete_file': 'Delete file',
+      'delete_files': 'Delete file(s)',
+      'delete_confirm': 'Do you really want to delete the file',
+      'delete_files_confirm': 'Do you really want to delete the file(s)',
+      'delete_note': '(note: the file(s) will be deleted from the app file list and from the device)',
+      'delete_all': 'Delete all files',
+      'delete_all_confirm': 'Do you really want to delete all files',
+      'delete_all_note': '(note: all files will be deleted from the app file list and from the device)',
+      'select_files': 'Select files to delete',
+      'delete_selected': 'Delete selected',
+      'refresh': 'Refresh list',
+      'select_language_label': 'Select language:',
+      'about_description': 'Vorxy Code Editor is a mobile development environment for Android devices. The application allows you to write, edit, load and save code in 10 programming languages with syntax highlighting.',
       'about_full_text':
         'Vorxy Code Editor is a mobile development environment for Android devices. '
-        'The application allows you to write, edit and save code in 10 programming '
+        'The application allows you to write, edit, load and save code in 10 programming '
         'languages with syntax highlighting.\n\n'
         'The application is designed for programmers, students and anyone who wants '
         'to have access to their code anytime, anywhere.\n\n'
