@@ -80,6 +80,8 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  bool _isNavigating = false;
+
   @override
   void initState() {
     super.initState();
@@ -87,6 +89,9 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _checkPermissionsAndNavigate() async {
+    if (_isNavigating) return;
+    _isNavigating = true;
+
     final status = await Permission.manageExternalStorage.status;
     if (status.isGranted) {
       await Future.delayed(const Duration(milliseconds: 300));
@@ -101,6 +106,7 @@ class _SplashScreenState extends State<SplashScreen> {
           Navigator.pushReplacementNamed(context, '/home');
         }
       } else {
+        _isNavigating = false;
         _checkPermissionsAndNavigate();
       }
     }
