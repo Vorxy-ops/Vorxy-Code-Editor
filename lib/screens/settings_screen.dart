@@ -177,7 +177,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _buildLanguageTile(),
           _buildSectionHeader(_getTranslation('about_app')),
           _buildAboutTile(),
-          _buildSectionHeader(_getTranslation('contacts')),
           _buildIconTile(
             icon: Icons.telegram,
             title: _getTranslation('telegram_channel'),
@@ -202,18 +201,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _buildSectionHeader(_getTranslation('legal')),
           _buildIconTile(
             icon: Icons.gavel,
-            title: _getTranslation('privacy_policy'),
-            onTap: () => _showLegalDialog(
-              _getTranslation('privacy_title'),
-              AppConstants.getPrivacyPolicy(_currentLanguage),
-            ),
-          ),
-          _buildIconTile(
-            icon: Icons.privacy_tip,
             title: _getTranslation('terms'),
             onTap: () => _showLegalDialog(
               _getTranslation('terms_title'),
               AppConstants.getTerms(_currentLanguage),
+            ),
+          ),
+          _buildIconTile(
+            icon: Icons.privacy_tip,
+            title: _getTranslation('privacy_policy'),
+            onTap: () => _showLegalDialog(
+              _getTranslation('privacy_title'),
+              AppConstants.getPrivacyPolicy(_currentLanguage),
             ),
           ),
           _buildIconTile(
