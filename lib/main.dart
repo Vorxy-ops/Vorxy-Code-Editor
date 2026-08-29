@@ -78,7 +78,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   _navigateToHome() async {
-    await Future.delayed(const Duration(milliseconds: 1500));
+    await Future.delayed(const Duration(milliseconds: 2000));
     if (mounted) {
       Navigator.pushReplacementNamed(context, '/home');
     }
@@ -89,14 +89,29 @@ class _SplashScreenState extends State<SplashScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFF1A0B2E),
       body: Center(
-        child: Text(
-          'Vorxy Code Editor',
-          style: TextStyle(
-            color: const Color(0xFFFFEB3B),
-            fontSize: 32,
-            fontWeight: FontWeight.bold,
-            fontFamily: 'sans-serif',
-          ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Vorxy Code Editor',
+              style: const TextStyle(
+                color: Color(0xFFFFEB3B),
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'sans-serif',
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'developed by GOSTOWN Co.',
+              style: const TextStyle(
+                color: Color(0xFFFFEB3B),
+                fontSize: 16,
+                fontWeight: FontWeight.normal,
+                fontFamily: 'Montserrat',
+              ),
+            ),
+          ],
         ),
       ),
     );
