@@ -61,6 +61,14 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
                 fontWeight: FontWeight.w500,
               ),
             ),
+            const Spacer(),
+            Text(
+              '${_controller.text.split('\n').length} ${_getTranslation('line')}',
+              style: const TextStyle(
+                color: Colors.grey,
+                fontSize: 12,
+              ),
+            ),
           ],
         ),
         const SizedBox(height: 8),
@@ -85,14 +93,6 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
                     ),
                   ),
                   const Spacer(),
-                  Text(
-                    '${_controller.text.split('\n').length} ${_getTranslation('line')}',
-                    style: const TextStyle(
-                      color: Colors.grey,
-                      fontSize: 11,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
                 ],
               ),
               const Divider(height: 1, color: Colors.grey),
@@ -110,36 +110,39 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
           ),
         ),
         const SizedBox(height: 8),
-        TextField(
-          controller: _controller,
-          maxLines: null,
-          minLines: 10,
-          style: const TextStyle(
-            color: Colors.white70,
-            fontSize: 14,
-            fontFamily: 'monospace',
+        Expanded(
+          child: TextField(
+            controller: _controller,
+            maxLines: null,
+            minLines: 10,
+            expands: true,
+            style: const TextStyle(
+              color: Colors.white70,
+              fontSize: 14,
+              fontFamily: 'monospace',
+            ),
+            decoration: InputDecoration(
+              hintText: _getTranslation('code_ready'),
+              hintStyle: const TextStyle(color: Colors.grey),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: const BorderSide(color: Colors.grey),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: const BorderSide(color: Colors.grey),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: const BorderSide(color: AppTheme.accentGold),
+              ),
+              filled: true,
+              fillColor: Colors.black26,
+            ),
+            onChanged: (value) {
+              widget.onCodeChanged(value);
+            },
           ),
-          decoration: InputDecoration(
-            hintText: _getTranslation('code_ready'),
-            hintStyle: const TextStyle(color: Colors.grey),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Colors.grey),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Colors.grey),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: AppTheme.accentGold),
-            ),
-            filled: true,
-            fillColor: Colors.black26,
-          ),
-          onChanged: (value) {
-            widget.onCodeChanged(value);
-          },
         ),
       ],
     );
