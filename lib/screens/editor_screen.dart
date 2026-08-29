@@ -69,7 +69,6 @@ class _EditorScreenState extends State<EditorScreen> {
     setState(() {
       _isLoading = true;
     });
-
     try {
       final prefs = await SharedPreferences.getInstance();
       final path = prefs.getString('lastFilePath');
@@ -109,7 +108,6 @@ class _EditorScreenState extends State<EditorScreen> {
   Future<void> _shareCode() async {
     final lines = _code.split('\n').length;
     final chars = _code.replaceAll(' ', '').replaceAll('\n', '').length;
-    
     final String message = '''
 Vorxy Code Editor v${AppConstants.version}
 developed by GOSTOWN Co.
@@ -123,7 +121,6 @@ $_language
 $lines строк, $chars симв.
 $_code
 ''';
-
     try {
       await Share.share(message);
     } catch (e) {
@@ -140,28 +137,22 @@ $_code
 
   Future<void> _openFile() async {
     if (_isLoading) return;
-    
     try {
       final result = await FilePicker.platform.pickFiles(
         allowMultiple: false,
         type: FileType.custom,
         allowedExtensions: ['py', 'js', 'c', 'cpp', 'java', 'cs', 'vb', 'sql', 'r', 'rs', 'html'],
       );
-
       if (result == null) return;
-
       final filePath = result.files.single.path;
       if (filePath == null) return;
-
       setState(() {
         _isLoading = true;
       });
-
       final file = File(filePath);
       final content = await file.readAsString();
       final ext = filePath.split('.').last;
       final lang = _getLanguageFromExtension('.$ext');
-
       if (lang.isEmpty) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -176,16 +167,13 @@ $_code
         });
         return;
       }
-
       setState(() {
         _code = content;
         _fileName = filePath.split('/').last.split('.').first;
         _language = lang;
       });
-
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('lastFilePath', filePath);
-
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -214,11 +202,9 @@ $_code
 
   Future<void> _saveFile() async {
     if (_isSaving) return;
-    
     try {
       String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
       if (selectedDirectory == null) return;
-
       final TextEditingController nameController = TextEditingController(text: _fileName);
       final result = await showDialog<String>(
         context: context,
@@ -243,16 +229,12 @@ $_code
           ],
         ),
       );
-
       if (result == null || result.isEmpty) return;
-
       setState(() {
         _isSaving = true;
       });
-
       final fileName = result + _getExtension(_language);
       final filePath = '$selectedDirectory/$fileName';
-
       if (await File(filePath).exists()) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -267,17 +249,13 @@ $_code
         });
         return;
       }
-
       final file = File(filePath);
       await file.writeAsString(_code);
-
       setState(() {
         _fileName = result;
       });
-
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('lastFilePath', filePath);
-
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -312,7 +290,6 @@ $_code
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
     return Scaffold(
       appBar: AppBar(
         title: Text(_getTranslation('editor')),
