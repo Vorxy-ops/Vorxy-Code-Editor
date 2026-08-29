@@ -104,6 +104,7 @@ class _EditorScreenState extends State<EditorScreen> {
     try {
       final result = await FilePicker.platform.pickFiles(
         allowMultiple: false,
+        type: FileType.custom,
         allowedExtensions: ['py', 'js', 'c', 'cpp', 'java', 'cs', 'vb', 'sql', 'r', 'rs', 'html'],
       );
 
@@ -138,7 +139,7 @@ class _EditorScreenState extends State<EditorScreen> {
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${_getTranslation('error')}: $e')),
+        SnackBar(content: Text('${_getTranslation('error')}: ${_getTranslation('error_loading_file')} $e')),
       );
     }
   }
