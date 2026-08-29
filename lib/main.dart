@@ -21,17 +21,19 @@ class VorxyCodeEditor extends StatefulWidget {
 
 class _VorxyCodeEditorState extends State<VorxyCodeEditor> {
   bool _isDarkMode = true;
+  String _currentLanguage = 'ru';
 
   @override
   void initState() {
     super.initState();
-    _loadTheme();
+    _loadSettings();
   }
 
-  Future<void> _loadTheme() async {
+  Future<void> _loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       _isDarkMode = prefs.getBool('darkMode') ?? true;
+      _currentLanguage = prefs.getString('language') ?? 'ru';
     });
   }
 
@@ -41,22 +43,43 @@ class _VorxyCodeEditorState extends State<VorxyCodeEditor> {
     });
   }
 
+  void _changeLanguage(String langCode) {
+    setState(() {
+      _currentLanguage = langCode;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Vorxy Code Editor',
       theme: _isDarkMode ? AppTheme.darkTheme : AppTheme.lightTheme,
-      home: SplashScreen(onThemeChanged: _toggleTheme),
+      home: SplashScreen(
+        onThemeChanged: _toggleTheme,
+        onLanguageChanged: _changeLanguage,
+        currentLanguage: _currentLanguage,
+      ),
       debugShowCheckedModeBanner: false,
       routes: {
-        '/home': (context) => HomeScreen(onThemeChanged: _toggleTheme),
-        '/settings': (context) => SettingsScreen(
-              currentLanguage: 'ru',
+        '/home': (context) => HomeScreen(
               onThemeChanged: _toggleTheme,
+              onLanguageChanged: _changeLanguage,
+              currentLanguage: _currentLanguage,
             ),
-        '/editor': (context) => const EditorScreen(currentLanguage: 'ru'),
-        '/files': (context) => const FilesScreen(currentLanguage: 'ru'),
-        '/languages': (context) => const LanguagesScreen(currentLanguage: 'ru'),
+        '/settings': (context) => SettingsScreen(
+              currentLanguage: _currentLanguage,
+              onThemeChanged: _toggleTheme,
+              onLanguageChanged: _changeLanguage,
+            ),
+        '/editor': (context) => EditorScreen(
+              currentLanguage: _currentLanguage,
+            ),
+        '/files': (context) => FilesScreen(
+              currentLanguage: _currentLanguage,
+            ),
+        '/languages': (context) => LanguagesScreen(
+              currentLanguage: _currentLanguage,
+            ),
       },
     );
   }
@@ -64,8 +87,15 @@ class _VorxyCodeEditorState extends State<VorxyCodeEditor> {
 
 class SplashScreen extends StatefulWidget {
   final Function(bool) onThemeChanged;
+  final Function(String) onLanguageChanged;
+  final String currentLanguage;
 
-  const SplashScreen({super.key, required this.onThemeChanged});
+  const SplashScreen({
+    super.key,
+    required this.onThemeChanged,
+    required this.onLanguageChanged,
+    required this.currentLanguage,
+  });
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
