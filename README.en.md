@@ -172,6 +172,6 @@ All disputes are resolved in accordance with the legislation of the country of r
 
 8. Contacts.
 
-- [Telegram Channel](https://t.me/VorxyCodeEditor)
-- [Telegram Chat](https://t.me/VorxyCodeEditorChat)
-- [GitHub](https://github.com/Vorxy-ops/Vorxy-Code-Editor.git)
+[Telegram Channel](https://t.me/VorxyCodeEditor)
+[Telegram Chat](https://t.me/VorxyCodeEditorChat)
+[GitHub](https://github.com/Vorxy-ops/Vorxy-Code-Editor.git)
