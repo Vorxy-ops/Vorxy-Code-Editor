@@ -80,7 +80,7 @@ PRIVACY POLICY Vorxy Code Editor.
 
 Effective Date: September 1, 2026.
 
-1.Introduction.
+1. Introduction.
 
 This Privacy Policy describes how GOSTOWN Co. collects, uses and protects the information you provide when using the Vorxy Code Editor mobile application.
 
