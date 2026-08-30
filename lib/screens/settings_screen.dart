@@ -153,7 +153,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: _getTranslation('email_error'),
+          content: Text(_getTranslation('email_error')),
           backgroundColor: Colors.orange,
         ),
       );
