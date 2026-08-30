@@ -116,43 +116,42 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final Uri uri = Uri.parse('https://github.com/Vorxy-ops/Vorxy-Code-Editor');
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
-      return;
-    }
-    if (await canLaunchUrl(uri)) {
+    } else if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.platformDefault);
-      return;
-    }
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('${_getTranslation('cannot_open_link')} ${AppConstants.githubRepo}'),
-          backgroundColor: Colors.orange,
-        ),
-      );
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${_getTranslation('cannot_open_link')} ${AppConstants.githubRepo}'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
     }
   }
 
   Future<void> _openEmail() async {
-    final String subject = _getTranslation('bug_report_subject');
-    final String body = _getTranslation('bug_report_body');
-    final String email = AppConstants.supportEmail;
-
-    final Uri emailUri = Uri(
-      scheme: 'mailto',
-      path: email,
-      query: 'subject=${Uri.encodeComponent(subject)}&body=${Uri.encodeComponent(body)}',
-    );
-
     try {
+      final String subject = _getTranslation('bug_report_subject');
+      final String body = _getTranslation('bug_report_body');
+      
+      final Uri emailUri = Uri(
+        scheme: 'mailto',
+        path: AppConstants.supportEmail,
+        query: 'subject=${Uri.encodeComponent(subject)}&body=${Uri.encodeComponent(body)}',
+      );
+      
       if (await canLaunchUrl(emailUri)) {
         await launchUrl(
           emailUri,
-          mode: LaunchMode.platformDefault,
+          mode: LaunchMode.externalApplication,
         );
       } else {
         final Uri fallbackUri = Uri(
-          scheme: 'mailto',
-          path: email,
+          scheme: 'https',
+          host: 'mail.google.com',
+          path: '/mail/u/0/',
+          query: 'view=cm&fs=1&to=${AppConstants.supportEmail}&su=${Uri.encodeComponent(subject)}&body=${Uri.encodeComponent(body)}',
         );
         if (await canLaunchUrl(fallbackUri)) {
           await launchUrl(
