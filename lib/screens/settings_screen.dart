@@ -130,57 +130,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
-  Future<void> _openEmail() async {
-    try {
-      final String subject = _getTranslation('bug_report_subject');
-      final String body = _getTranslation('bug_report_body');
-      
-      final Uri emailUri = Uri(
-        scheme: 'mailto',
-        path: AppConstants.supportEmail,
-        query: 'subject=${Uri.encodeComponent(subject)}&body=${Uri.encodeComponent(body)}',
-      );
-      
-      if (await canLaunchUrl(emailUri)) {
-        await launchUrl(
-          emailUri,
-          mode: LaunchMode.externalApplication,
-        );
-      } else {
-        final Uri fallbackUri = Uri(
-          scheme: 'https',
-          host: 'mail.google.com',
-          path: '/mail/u/0/',
-          query: 'view=cm&fs=1&to=${AppConstants.supportEmail}&su=${Uri.encodeComponent(subject)}&body=${Uri.encodeComponent(body)}',
-        );
-        if (await canLaunchUrl(fallbackUri)) {
-          await launchUrl(
-            fallbackUri,
-            mode: LaunchMode.platformDefault,
-          );
-        } else {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(_getTranslation('email_error')),
-                backgroundColor: Colors.orange,
-              ),
-            );
-          }
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('${_getTranslation('error')}: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    }
-  }
-
   Future<void> _exitApp() async {
     final result = await showDialog<bool>(
       context: context,
@@ -232,12 +181,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
             icon: Icons.code,
             title: _getTranslation('github'),
             onTap: _openGitHub,
-          ),
-          _buildSectionHeader(_getTranslation('support')),
-          _buildIconTile(
-            icon: Icons.email,
-            title: _getTranslation('email'),
-            onTap: _openEmail,
           ),
           _buildSectionHeader(_getTranslation('legal')),
           _buildIconTile(
