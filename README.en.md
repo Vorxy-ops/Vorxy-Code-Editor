@@ -35,7 +35,6 @@ The application is designed for programmers, students and anyone who wants to ha
 - Dark/Light theme
 - Multiple language interface (Русский, English)
 - File management (delete, select multiple, delete all)
-- Send bug reports via email
 
 ---
 
@@ -60,7 +59,6 @@ The application is designed for programmers, students and anyone who wants to ha
 - Telegram channel: https://t.me/VorxyCodeEditor
 - Telegram chat: https://t.me/VorxyCodeEditorChat
 - GitHub: https://github.com/Vorxy-ops/Vorxy-Code-Editor.git
-- Email: vorxygtn@mail.ru
 
 ---
 
@@ -78,18 +76,102 @@ The application is designed for programmers, students and anyone who wants to ha
 
 ## Privacy Policy
 
+PRIVACY POLICY Vorxy Code Editor.
+
+Effective Date: September 1, 2026.
+
+1. Introduction.
+
+This Privacy Policy describes how GOSTOWN Co. collects, uses and protects the information you provide when using the Vorxy Code Editor mobile application.
+
+We respect your privacy and are committed to protecting your personal data.
+
+2. What information we collect.
+
 The Vorxy Code Editor application works completely without internet and does not collect your personal data. We do not request, store or transfer information about you to third parties.
 
-All your data (code, files, settings) is stored exclusively on your device. You can delete them at any time by deleting the application or clearing its data in your device settings.
+When using the Application: Code and files are stored locally on your device. Settings are saved locally on your device. Personal data is not requested.
 
-Detailed information is presented in the "Privacy Policy" section inside the application.
+3. How we use your information.
+
+Since we do not collect your information, we do not use it for any purposes.
+
+4. Transfer of data to third parties.
+
+We do not transfer, sell or exchange your information with third parties.
+
+5. Data storage.
+
+All your data is stored exclusively on your device.
+
+6. Security.
+
+We take all reasonable measures to protect data.
+
+7. Links to third party resources.
+
+The Application may contain links to external resources.
+
+8. Changes to the Privacy Policy.
+
+We reserve the right to update this Privacy Policy.
+
+9. Contacts.
+
+Telegram Channel
+Telegram Chat
+GitHub
 
 ---
 
 ## Terms of Service
 
-Use of the Vorxy Code Editor application constitutes full and unconditional acceptance of the Terms of Service.
+TERMS OF SERVICE Vorxy Code Editor.
 
-The application is provided "as is". The developer does not guarantee that the application will operate without errors and failures.
+Effective Date: September 1, 2026.
 
-Detailed information is presented in the "Terms of Service" section inside the application.
+1. General Provisions.
+
+This Terms of Service governs the relationship between GOSTOWN Co. and the user of the Vorxy Code Editor mobile application.
+
+Use of the Application constitutes full and unconditional acceptance of the terms of this Agreement.
+
+2. Functionality of the Application.
+
+The Application provides the user with the ability to write and edit code in 10 programming languages, save and open files locally on the device, manage files and folders, customize the appearance and behavior of the editor.
+
+3. Rights and obligations of the user.
+
+The user undertakes to use the Application in accordance with its functional purpose, not to use the Application to create malicious code or software, not to violate the laws of the country of residence.
+
+The user has the right to use all features of the Application for free, save code and files locally.
+
+4. Rights and obligations of the Copyright Holder.
+
+The Copyright Holder undertakes to provide access to the Application and its functions, correct identified errors and improve the Application, ensure the operation of communication channels.
+
+The Copyright Holder has the right to make changes to the functionality of the Application and update this Agreement.
+
+5. Limitation of liability.
+
+The Application is provided as is. The Copyright Holder does not guarantee that the Application will operate without errors and failures.
+
+The Copyright Holder is not responsible for loss of data, damage, operation of third-party services.
+
+6. Intellectual property.
+
+The Application code and its design are the intellectual property of the Copyright Holder.
+
+The user retains all rights to their code and files.
+
+7. Final provisions.
+
+This Agreement comes into force from the moment of first use of the Application.
+
+All disputes are resolved in accordance with the legislation of the country of registration of the Copyright Holder.
+
+8. Contacts.
+
+Telegram Channel
+Telegram Chat
+GitHub
