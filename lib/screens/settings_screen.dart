@@ -70,38 +70,58 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
-  Future<void> _openLink(String url) async {
-    try {
-      final Uri uri = Uri.parse(url);
+  Future<void> _openTelegramChannel() async {
+    final List<Uri> uris = [
+      Uri.parse('tg://resolve?domain=VorxyCodeEditor'),
+      Uri.parse('https://t.me/VorxyCodeEditor'),
+    ];
+    for (final uri in uris) {
       if (await canLaunchUrl(uri)) {
-        await launchUrl(
-          uri,
-          mode: LaunchMode.externalApplication,
-        );
-      } else {
-        final Uri fallbackUri = Uri.parse(url);
-        if (await canLaunchUrl(fallbackUri)) {
-          await launchUrl(
-            fallbackUri,
-            mode: LaunchMode.platformDefault,
-          );
-        } else {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('${_getTranslation('cannot_open_link')} $url'),
-                backgroundColor: Colors.orange,
-              ),
-            );
-          }
-        }
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+        return;
       }
-    } catch (e) {
+    }
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${_getTranslation('cannot_open_link')} ${AppConstants.telegramChannel}'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+    }
+  }
+
+  Future<void> _openTelegramChat() async {
+    final List<Uri> uris = [
+      Uri.parse('tg://resolve?domain=VorxyCodeEditorChat'),
+      Uri.parse('https://t.me/VorxyCodeEditorChat'),
+    ];
+    for (final uri in uris) {
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+        return;
+      }
+    }
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${_getTranslation('cannot_open_link')} ${AppConstants.telegramChat}'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+    }
+  }
+
+  Future<void> _openGitHub() async {
+    final Uri uri = Uri.parse(AppConstants.githubRepo);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.platformDefault);
+    } else {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('${_getTranslation('error')}: $e'),
-            backgroundColor: Colors.red,
+            content: Text('${_getTranslation('cannot_open_link')} ${AppConstants.githubRepo}'),
+            backgroundColor: Colors.orange,
           ),
         );
       }
@@ -109,48 +129,32 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _openEmail() async {
-    try {
-      final Uri emailUri = Uri(
+    final List<Uri> uris = [
+      Uri(
         scheme: 'mailto',
         path: AppConstants.supportEmail,
         query: 'subject=${Uri.encodeComponent(_getTranslation('bug_report_subject'))}&body=${Uri.encodeComponent(_getTranslation('bug_report_body'))}',
+      ),
+      Uri(
+        scheme: 'https',
+        host: 'mail.google.com',
+        path: '/mail/u/0/',
+        query: 'view=cm&fs=1&to=${AppConstants.supportEmail}&su=${Uri.encodeComponent(_getTranslation('bug_report_subject'))}&body=${Uri.encodeComponent(_getTranslation('bug_report_body'))}',
+      ),
+    ];
+    for (final uri in uris) {
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+        return;
+      }
+    }
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: _getTranslation('email_error'),
+          backgroundColor: Colors.orange,
+        ),
       );
-      if (await canLaunchUrl(emailUri)) {
-        await launchUrl(
-          emailUri,
-          mode: LaunchMode.externalApplication,
-        );
-      } else {
-        final Uri fallbackUri = Uri(
-          scheme: 'mailto',
-          path: AppConstants.supportEmail,
-          query: 'subject=${Uri.encodeComponent(_getTranslation('bug_report_subject'))}&body=${Uri.encodeComponent(_getTranslation('bug_report_body'))}',
-        );
-        if (await canLaunchUrl(fallbackUri)) {
-          await launchUrl(
-            fallbackUri,
-            mode: LaunchMode.platformDefault,
-          );
-        } else {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(_getTranslation('email_error')),
-                backgroundColor: Colors.orange,
-              ),
-            );
-          }
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('${_getTranslation('error')}: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
     }
   }
 
@@ -194,17 +198,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _buildIconTile(
             icon: Icons.telegram,
             title: _getTranslation('telegram_channel'),
-            onTap: () => _openLink(AppConstants.telegramChannel),
+            onTap: _openTelegramChannel,
           ),
           _buildIconTile(
             icon: Icons.chat,
             title: _getTranslation('telegram_chat'),
-            onTap: () => _openLink(AppConstants.telegramChat),
+            onTap: _openTelegramChat,
           ),
           _buildIconTile(
             icon: Icons.code,
             title: _getTranslation('github'),
-            onTap: () => _openLink(AppConstants.githubRepo),
+            onTap: _openGitHub,
           ),
           _buildSectionHeader(_getTranslation('support')),
           _buildIconTile(
