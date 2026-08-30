@@ -454,44 +454,36 @@ class _SettingsScreenState extends State<SettingsScreen> {
         continue;
       }
       
-      if (line.trim().startsWith('Telegram-канал:') || 
-          line.trim().startsWith('Telegram Channel:') ||
-          line.trim().startsWith('Чат Telegram:') ||
-          line.trim().startsWith('Telegram Chat:') ||
-          line.trim().startsWith('GitHub:') ||
-          line.trim().startsWith('Email:')) {
-        
-        final parts = line.split(': ');
-        if (parts.length == 2) {
-          final label = parts[0];
-          final url = parts[1];
-          widgets.add(
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4),
-              child: Row(
-                children: [
-                  Text(
-                    '$label: ',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  Expanded(
-                    child: InkWell(
-                      onTap: () => _openLink(url),
-                      child: Text(
-                        url,
-                        style: const TextStyle(
-                          color: Colors.blue,
-                          decoration: TextDecoration.underline,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+      if (line.trim() == 'Telegram-канал' ||
+          line.trim() == 'Чат Telegram' ||
+          line.trim() == 'GitHub' ||
+          line.trim() == 'Telegram Channel' ||
+          line.trim() == 'Telegram Chat') {
+        String url = '';
+        if (line.trim() == 'Telegram-канал' || line.trim() == 'Telegram Channel') {
+          url = AppConstants.telegramChannel;
+        } else if (line.trim() == 'Чат Telegram' || line.trim() == 'Telegram Chat') {
+          url = AppConstants.telegramChat;
+        } else if (line.trim() == 'GitHub') {
+          url = AppConstants.githubRepo;
+        }
+        widgets.add(
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            child: InkWell(
+              onTap: () => _openLink(url),
+              child: Text(
+                line.trim(),
+                style: const TextStyle(
+                  color: Colors.blue,
+                  fontSize: 14,
+                  decoration: TextDecoration.none,
+                ),
               ),
             ),
-          );
-          continue;
-        }
+          ),
+        );
+        continue;
       }
       
       widgets.add(
