@@ -116,47 +116,60 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final Uri uri = Uri.parse('https://github.com/Vorxy-ops/Vorxy-Code-Editor');
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
-    } else if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.platformDefault);
-    } else {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('${_getTranslation('cannot_open_link')} ${AppConstants.githubRepo}'),
-            backgroundColor: Colors.orange,
-          ),
-        );
-      }
+      return;
     }
-  }
-
-  Future<void> _openEmail() async {
-    final List<Uri> uris = [
-      Uri(
-        scheme: 'mailto',
-        path: AppConstants.supportEmail,
-        query: 'subject=${Uri.encodeComponent(_getTranslation('bug_report_subject'))}&body=${Uri.encodeComponent(_getTranslation('bug_report_body'))}',
-      ),
-      Uri(
-        scheme: 'https',
-        host: 'mail.google.com',
-        path: '/mail/u/0/',
-        query: 'view=cm&fs=1&to=${AppConstants.supportEmail}&su=${Uri.encodeComponent(_getTranslation('bug_report_subject'))}&body=${Uri.encodeComponent(_getTranslation('bug_report_body'))}',
-      ),
-    ];
-    for (final uri in uris) {
-      if (await canLaunchUrl(uri)) {
-        await launchUrl(uri, mode: LaunchMode.externalApplication);
-        return;
-      }
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.platformDefault);
+      return;
     }
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(_getTranslation('email_error')),
+          content: Text('${_getTranslation('cannot_open_link')} ${AppConstants.githubRepo}'),
           backgroundColor: Colors.orange,
         ),
       );
+    }
+  }
+
+  Future<void> _openEmail() async {
+    try {
+      final Uri emailUri = Uri(
+        scheme: 'mailto',
+        path: AppConstants.supportEmail,
+        query: 'subject=${Uri.encodeComponent(_getTranslation('bug_report_subject'))}&body=${Uri.encodeComponent(_getTranslation('bug_report_body'))}',
+      );
+      if (await canLaunchUrl(emailUri)) {
+        await launchUrl(emailUri, mode: LaunchMode.externalApplication);
+        return;
+      }
+      final Uri gmailUri = Uri(
+        scheme: 'https',
+        host: 'mail.google.com',
+        path: '/mail/u/0/',
+        query: 'view=cm&fs=1&to=${AppConstants.supportEmail}&su=${Uri.encodeComponent(_getTranslation('bug_report_subject'))}&body=${Uri.encodeComponent(_getTranslation('bug_report_body'))}',
+      );
+      if (await canLaunchUrl(gmailUri)) {
+        await launchUrl(gmailUri, mode: LaunchMode.platformDefault);
+        return;
+      }
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(_getTranslation('email_error')),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${_getTranslation('error')}: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
