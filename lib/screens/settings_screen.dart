@@ -113,8 +113,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _openGitHub() async {
-    final Uri uri = Uri.parse(AppConstants.githubRepo);
+    final Uri uri = Uri.parse('https://github.com/Vorxy-ops/Vorxy-Code-Editor');
     if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.platformDefault);
     } else {
       if (mounted) {
