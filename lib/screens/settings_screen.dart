@@ -70,6 +70,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
+  Future<void> _openLink(String url) async {
+    try {
+      final Uri uri = Uri.parse(url);
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('${_getTranslation('cannot_open_link')} $url'),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${_getTranslation('error')}: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
   Future<void> _openTelegramChannel() async {
     final List<Uri> uris = [
       Uri.parse('tg://resolve?domain=VorxyCodeEditor'),
@@ -402,9 +429,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
       builder: (context) => AlertDialog(
         title: Text(title),
         content: SingleChildScrollView(
-          child: Text(
-            content,
-            style: const TextStyle(fontSize: 14, height: 1.5),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: _buildLegalContent(content),
           ),
         ),
         actions: [
@@ -415,6 +442,70 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ],
       ),
     );
+  }
+
+  List<Widget> _buildLegalContent(String content) {
+    final List<Widget> widgets = [];
+    final lines = content.split('\n');
+    
+    for (final line in lines) {
+      if (line.trim().isEmpty) {
+        widgets.add(const SizedBox(height: 8));
+        continue;
+      }
+      
+      if (line.trim().startsWith('Telegram-канал:') || 
+          line.trim().startsWith('Telegram Channel:') ||
+          line.trim().startsWith('Чат Telegram:') ||
+          line.trim().startsWith('Telegram Chat:') ||
+          line.trim().startsWith('GitHub:') ||
+          line.trim().startsWith('Email:')) {
+        
+        final parts = line.split(': ');
+        if (parts.length == 2) {
+          final label = parts[0];
+          final url = parts[1];
+          widgets.add(
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Row(
+                children: [
+                  Text(
+                    '$label: ',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  Expanded(
+                    child: InkWell(
+                      onTap: () => _openLink(url),
+                      child: Text(
+                        url,
+                        style: const TextStyle(
+                          color: Colors.blue,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+          continue;
+        }
+      }
+      
+      widgets.add(
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 2),
+          child: Text(
+            line,
+            style: const TextStyle(fontSize: 14, height: 1.5),
+          ),
+        ),
+      );
+    }
+    
+    return widgets;
   }
 
   void _showAboutDialog() {
