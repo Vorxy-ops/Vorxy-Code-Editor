@@ -133,33 +133,42 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _openEmail() async {
+    final String subject = _getTranslation('bug_report_subject');
+    final String body = _getTranslation('bug_report_body');
+    final String email = AppConstants.supportEmail;
+
+    final Uri emailUri = Uri(
+      scheme: 'mailto',
+      path: email,
+      query: 'subject=${Uri.encodeComponent(subject)}&body=${Uri.encodeComponent(body)}',
+    );
+
     try {
-      final Uri emailUri = Uri(
-        scheme: 'mailto',
-        path: AppConstants.supportEmail,
-        query: 'subject=${Uri.encodeComponent(_getTranslation('bug_report_subject'))}&body=${Uri.encodeComponent(_getTranslation('bug_report_body'))}',
-      );
       if (await canLaunchUrl(emailUri)) {
-        await launchUrl(emailUri, mode: LaunchMode.externalApplication);
-        return;
-      }
-      final Uri gmailUri = Uri(
-        scheme: 'https',
-        host: 'mail.google.com',
-        path: '/mail/u/0/',
-        query: 'view=cm&fs=1&to=${AppConstants.supportEmail}&su=${Uri.encodeComponent(_getTranslation('bug_report_subject'))}&body=${Uri.encodeComponent(_getTranslation('bug_report_body'))}',
-      );
-      if (await canLaunchUrl(gmailUri)) {
-        await launchUrl(gmailUri, mode: LaunchMode.platformDefault);
-        return;
-      }
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(_getTranslation('email_error')),
-            backgroundColor: Colors.orange,
-          ),
+        await launchUrl(
+          emailUri,
+          mode: LaunchMode.platformDefault,
         );
+      } else {
+        final Uri fallbackUri = Uri(
+          scheme: 'mailto',
+          path: email,
+        );
+        if (await canLaunchUrl(fallbackUri)) {
+          await launchUrl(
+            fallbackUri,
+            mode: LaunchMode.platformDefault,
+          );
+        } else {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(_getTranslation('email_error')),
+                backgroundColor: Colors.orange,
+              ),
+            );
+          }
+        }
       }
     } catch (e) {
       if (mounted) {
