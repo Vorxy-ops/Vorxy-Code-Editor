@@ -4,6 +4,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../widgets/code_editor_widget.dart';
 import '../utils/theme.dart';
 import '../utils/constants.dart';
@@ -148,19 +149,30 @@ class _EditorScreenState extends State<EditorScreen> with AutomaticKeepAliveClie
   Future<void> _shareCode() async {
     final lines = _code.split('\n').length;
     final chars = _code.replaceAll(' ', '').replaceAll('\n', '').length;
+    final String lang = _language;
+    final String version = AppConstants.version;
+    final String developer = AppConstants.developer;
+    final String telegramChannel = AppConstants.telegramChannel;
+    final String telegramChat = AppConstants.telegramChat;
+    final String githubRepo = AppConstants.githubRepo;
+    final String rustoreUrl = 'https://www.rustore.ru';
+    final String itchIoUrl = 'https://vorxy-ops.itch.io';
+
     final String message = '''
-Vorxy Code Editor v${AppConstants.version}
-developed by GOSTOWN Co.
+Vorxy Code Editor v$version
+developed by $developer
 
-Telegram-канал: ${AppConstants.telegramChannel}
-Чат Telegram: ${AppConstants.telegramChat}
-GitHub: ${AppConstants.githubRepo}
-Email: ${AppConstants.supportEmail}
+${_getTranslation('where_to_download')}
+RuStore GitHub itch.io
 
-$_language
-$lines строк, $chars симв.
+${_getTranslation('contacts')}
+Telegram-канал Чат Telegram
+
+$lang
+$lines ${_getTranslation('line')}, $chars ${_getTranslation('chars')}
 $_code
 ''';
+
     try {
       await Share.share(message);
     } catch (e) {
