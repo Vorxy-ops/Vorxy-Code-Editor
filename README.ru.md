@@ -63,9 +63,9 @@ Vorxy Code Editor — это мобильная среда разработки 
 
 ## Где скачать
 
-- RuStore: https://www.rustore.ru/
-- GitHub: https://github.com/Vorxy-ops/Vorxy-Code-Editor
-- itch.io: https://vorxy-ops.itch.io
+- [RuStore](https://www.rustore.ru/)
+- [GitHub](https://github.com/Vorxy-ops/Vorxy-Code-Editor)
+- [itch.io](https://vorxy-ops.itch.io)
 
 ---
 
