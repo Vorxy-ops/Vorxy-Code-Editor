@@ -243,4 +243,4 @@ class AppConstants {
   static String getTerms(String langCode) {
     return termsTranslations[langCode] ?? termsTranslations['ru']!;
   }
-} 
+}
