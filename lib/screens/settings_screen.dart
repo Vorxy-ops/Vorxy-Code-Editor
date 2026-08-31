@@ -181,27 +181,32 @@ class _SettingsScreenState extends State<SettingsScreen> {
             icon: Icons.store,
             title: 'RuStore',
             onTap: () => _openLink('https://www.rustore.ru/'),
+            showArrow: true,
           ),
           _buildIconTile(
             icon: Icons.code,
             title: _getTranslation('github'),
             onTap: () => _openLink(AppConstants.githubRepo),
+            showArrow: true,
           ),
           _buildIconTile(
             icon: Icons.gamepad,
             title: 'itch.io',
             onTap: () => _openLink('https://vorxy-ops.itch.io/vorxy-code-editor'),
+            showArrow: true,
           ),
           _buildSectionHeader(_getTranslation('contacts')),
           _buildIconTile(
             icon: Icons.telegram,
             title: _getTranslation('telegram_channel'),
             onTap: _openTelegramChannel,
+            showArrow: true,
           ),
           _buildIconTile(
             icon: Icons.chat,
             title: _getTranslation('telegram_chat'),
             onTap: _openTelegramChat,
+            showArrow: true,
           ),
           _buildSectionHeader(_getTranslation('legal')),
           _buildIconTile(
@@ -211,6 +216,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               _getTranslation('terms_title'),
               AppConstants.getTerms(_currentLanguage),
             ),
+            showArrow: false,
           ),
           _buildIconTile(
             icon: Icons.shield,
@@ -219,11 +225,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
               _getTranslation('privacy_title'),
               AppConstants.getPrivacyPolicy(_currentLanguage),
             ),
+            showArrow: false,
           ),
           _buildIconTile(
             icon: Icons.exit_to_app,
             title: _getTranslation('exit'),
             onTap: _exitApp,
+            showArrow: false,
           ),
           _buildSectionHeader(''),
           _buildInfoTile(),
@@ -322,11 +330,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
     required IconData icon,
     required String title,
     required VoidCallback onTap,
+    required bool showArrow,
   }) {
     return ListTile(
       leading: Icon(icon, color: AppTheme.accentGold),
       title: Text(title),
-      trailing: const Icon(Icons.open_in_new, size: 16, color: Colors.grey),
+      trailing: showArrow
+          ? const Icon(Icons.open_in_new, size: 16, color: Colors.grey)
+          : const Icon(Icons.arrow_forward_ios, size: 16),
       onTap: onTap,
     );
   }
