@@ -23,6 +23,7 @@ class AppConstants {
       'light_theme': 'Светлая тема',
       'theme': 'Тема',
       'where_to_download': 'Где скачать',
+      'rustore': 'RuStore',
       'telegram_channel': 'Telegram-канал',
       'telegram_chat': 'Чат Telegram',
       'github': 'GitHub',
@@ -79,7 +80,7 @@ class AppConstants {
       'language_label': 'Язык:',
       'privacy_title': 'Политика конфиденциальности',
       'terms_title': 'Пользовательское соглашение',
-      'all_rights_reserved': 'Все права защищены.',
+      'copyright': '© 2026 Все права защищены.',
       'about_description': 'Vorxy Code Editor — это мобильная среда разработки для устройств на базе Android. Приложение позволяет писать, редактировать, загружать и сохранять код на 10 языках программирования с подсветкой синтаксиса.',
       'about_full_text': 
         'Vorxy Code Editor — это мобильная среда разработки для устройств на базе Android. '
@@ -103,7 +104,7 @@ class AppConstants {
         '• Студенты IT-специальностей\n'
         '• Преподаватели программирования\n'
         '• Любители и энтузиасты\n\n'
-        '© 2026 GOSTOWN Co. Все права защищена.',
+        '© 2026 Все права защищены.',
     },
     'en': {
       'app_name': 'Vorxy Code Editor',
@@ -115,6 +116,7 @@ class AppConstants {
       'light_theme': 'Light Theme',
       'theme': 'Theme',
       'where_to_download': 'Where to download',
+      'rustore': 'RuStore',
       'telegram_channel': 'Telegram Channel',
       'telegram_chat': 'Telegram Chat',
       'github': 'GitHub',
@@ -171,7 +173,7 @@ class AppConstants {
       'language_label': 'Language:',
       'privacy_title': 'Privacy Policy',
       'terms_title': 'Terms of Service',
-      'all_rights_reserved': 'All rights reserved.',
+      'copyright': '© 2026 All rights reserved.',
       'about_description': 'Vorxy Code Editor is a mobile development environment for Android devices. The application allows you to write, edit, load and save code in 10 programming languages with syntax highlighting.',
       'about_full_text':
         'Vorxy Code Editor is a mobile development environment for Android devices. '
@@ -195,7 +197,7 @@ class AppConstants {
         '• IT students\n'
         '• Programming teachers\n'
         '• Hobbyists and enthusiasts\n\n'
-        '© 2026 GOSTOWN Co. All rights reserved.',
+        '© 2026 All rights reserved.',
     },
   };
 
@@ -233,14 +235,4 @@ class AppConstants {
 
   static const Map<String, String> termsTranslations = {
     'ru': 'ПОЛЬЗОВАТЕЛЬСКОЕ СОГЛАШЕНИЕ Vorxy Code Editor.\n\nДата вступления в силу: 1 сентября 2026 года.\n\n1. Общие положения.\n\nНастоящее Пользовательское соглашение регулирует отношения между компанией GOSTOWN Co. и пользователем мобильного приложения Vorxy Code Editor.\n\nИспользование Приложения означает полное и безоговорочное принятие условий настоящего Соглашения.\n\n2. Функционал Приложения.\n\nПриложение предоставляет пользователю возможность писать и редактировать код на 10 языках программирования, сохранять и открывать файлы локально на устройстве, управлять файлами и папками, настраивать внешний вид и поведение редактора.\n\n3. Права и обязанности пользователя.\n\nПользователь обязуется использовать Приложение в соответствии с его функциональным назначением, не использовать Приложение для создания вредоносного кода или ПО, не нарушать законодательство страны проживания.\n\nПользователь имеет право бесплатно использовать все функции Приложения, сохранять свой код и файлы локально.\n\n4. Права и обязанности Правообладателя.\n\nПравообладатель обязуется предоставлять доступ к Приложению и его функциям, исправлять выявленные ошибки и улучшать Приложение, обеспечивать работу каналов связи.\n\nПравообладатель имеет право вносить изменения в функционал Приложения и обновлять Соглашение.\n\n5. Ограничение ответственности.\n\nПриложение предоставляется как есть. Правообладатель не гарантирует, что Приложение будет работать без ошибок и сбоев.\n\nПравообладатель не несёт ответственности за потерю данных, ущерб, работу сторонних сервисов.\n\n6. Интеллектуальная собственность.\n\nКод Приложения и его дизайн являются интеллектуальной собственностью Правообладателя.\n\nПользователь сохраняет все права на свой код и файлы.\n\n7. Заключительные положения.\n\nСоглашение вступает в силу с момента первого использования Приложения.\n\nВсе споры решаются в соответствии с законодательством страны регистрации Правообладателя.\n\n8. Контакты.\n\nTelegram-канал\nЧат Telegram',
-    'en': 'TERMS OF SERVICE Vorxy Code Editor.\n\nEffective Date: September 1, 2026.\n\n1. General Provisions.\n\nThis Terms of Service governs the relationship between GOSTOWN Co. and the user of the Vorxy Code Editor mobile application.\n\nUse of the Application constitutes full and unconditional acceptance of the terms of this Agreement.\n\n2. Functionality of the Application.\n\nThe Application provides the user with the ability to write and edit code in 10 programming languages, save and open files locally on the device, manage files and folders, customize the appearance and behavior of the editor.\n\n3. Rights and obligations of the user.\n\nThe user undertakes to use the Application in accordance with its functional purpose, not to use the Application to create malicious code or software, not to violate the laws of the country of residence.\n\nThe user has the right to use all features of the Application for free, save code and files locally.\n\n4. Rights and obligations of the Copyright Holder.\n\nThe Copyright Holder undertakes to provide access to the Application and its functions, correct identified errors and improve the Application, ensure the operation of communication channels.\n\nThe Copyright Holder has the right to make changes to the functionality of the Application and update this Agreement.\n\n5. Limitation of liability.\n\nThe Application is provided as is. The Copyright Holder does not guarantee that the Application will operate without errors and failures.\n\nThe Copyright Holder is not responsible for loss of data, damage, operation of third-party services.\n\n6. Intellectual property.\n\nThe Application code and its design are the intellectual property of the Copyright Holder.\n\nThe user retains all rights to their code and files.\n\n7. Final provisions.\n\nThis Agreement comes into force from the moment of first use of the Application.\n\nAll disputes are resolved in accordance with the legislation of the country of registration of the Copyright Holder.\n\n8. Contacts.\n\nTelegram Channel\nTelegram Chat',
-  };
-
-  static String getPrivacyPolicy(String langCode) {
-    return privacyPolicyTranslations[langCode] ?? privacyPolicyTranslations['ru']!;
-  }
-
-  static String getTerms(String langCode) {
-    return termsTranslations[langCode] ?? termsTranslations['ru']!;
-  }
-}
+    'en': 'TERMS OF SERVICE Vorxy Code Editor.\n\nEffective Date: September 1, 2026.\n\n1. General Provisions.\n\nThis Terms of Service governs the relationship between GOSTOWN Co. and the user of the Vorxy Code Editor mobile application.\n\nUse of the Application constitutes full and unconditional acceptance of the terms of this Agreement.\n\n2. Functionality of the Application.\n\nThe Application provides the user with the ability to write and edit code in 10 programming languages, save and open files locally on the device, manage files and folders, customize the appearance and behavior of the editor.\n\n3. Rights and obligations of the user.\n\nThe user undertakes to use the Application in accordance with its functional purpose, not to use the Application to create malicious code or software, not to violate
