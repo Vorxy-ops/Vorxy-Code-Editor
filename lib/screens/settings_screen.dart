@@ -97,6 +97,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
+  Future<void> _openRuStore() async {
+    final List<Uri> uris = [
+      Uri.parse('ru.rustore://'),
+      Uri.parse('https://www.rustore.ru/'),
+    ];
+    for (final uri in uris) {
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+        return;
+      }
+    }
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${_getTranslation('cannot_open_link')} ${_getTranslation('rustore')}'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+    }
+  }
+
   Future<void> _openTelegramChannel() async {
     final List<Uri> uris = [
       Uri.parse('tg://resolve?domain=VorxyCodeEditor'),
@@ -180,12 +201,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _buildDownloadTile(
             icon: Icons.store,
             title: 'RuStore',
-            onTap: () => _openLink('https://www.rustore.ru/'),
+            onTap: _openRuStore,
           ),
           _buildDownloadTile(
             icon: Icons.code,
-            title: 'GitHub',
-            onTap: () => _openLink('https://github.com/Vorxy-ops/Vorxy-Code-Editor'),
+            title: _getTranslation('github'),
+            onTap: () => _openLink(AppConstants.githubRepo),
           ),
           _buildDownloadTile(
             icon: Icons.gamepad,
@@ -339,7 +360,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return ListTile(
       leading: Icon(icon, color: AppTheme.accentGold),
       title: Text(title),
-      trailing: const Icon(Icons.open_in_new, size: 16, color: Colors.grey),
+      trailing: const Icon(Icons.arrow_forward_ios, size: 16),
       onTap: onTap,
     );
   }
@@ -379,7 +400,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            _getTranslation('all_rights_reserved'),
+            _getTranslation('copyright'),
             style: const TextStyle(
               fontSize: 12,
               color: Colors.grey,
@@ -540,14 +561,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               Text(
                 _getTranslation('about_full_text'),
                 style: const TextStyle(fontSize: 14, height: 1.6),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                _getTranslation('all_rights_reserved'),
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey,
-                ),
               ),
             ],
           ),
