@@ -139,24 +139,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
-  Future<void> _openGitHub() async {
-    final Uri uri = Uri.parse('https://github.com/Vorxy-ops/Vorxy-Code-Editor');
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    } else if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.platformDefault);
-    } else {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('${_getTranslation('cannot_open_link')} ${AppConstants.githubRepo}'),
-            backgroundColor: Colors.orange,
-          ),
-        );
-      }
-    }
-  }
-
   Future<void> _exitApp() async {
     final result = await showDialog<bool>(
       context: context,
@@ -194,6 +176,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _buildLanguageTile(),
           _buildSectionHeader(_getTranslation('about_app')),
           _buildAboutTile(),
+          _buildSectionHeader(_getTranslation('where_to_download')),
+          _buildDownloadTile(
+            icon: Icons.store,
+            title: 'RuStore',
+            onTap: () => _openLink('https://www.rustore.ru/'),
+          ),
+          _buildDownloadTile(
+            icon: Icons.code,
+            title: 'GitHub',
+            onTap: () => _openLink('https://github.com/Vorxy-ops/Vorxy-Code-Editor'),
+          ),
+          _buildDownloadTile(
+            icon: Icons.gamepad,
+            title: 'itch.io',
+            onTap: () => _openLink('https://vorxy-ops.itch.io/vorxy-code-editor'),
+          ),
+          _buildSectionHeader(_getTranslation('contacts')),
           _buildIconTile(
             icon: Icons.telegram,
             title: _getTranslation('telegram_channel'),
@@ -203,11 +202,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
             icon: Icons.chat,
             title: _getTranslation('telegram_chat'),
             onTap: _openTelegramChat,
-          ),
-          _buildIconTile(
-            icon: Icons.code,
-            title: _getTranslation('github'),
-            onTap: _openGitHub,
           ),
           _buildSectionHeader(_getTranslation('legal')),
           _buildIconTile(
@@ -337,6 +331,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+  Widget _buildDownloadTile({
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+  }) {
+    return ListTile(
+      leading: Icon(icon, color: AppTheme.accentGold),
+      title: Text(title),
+      trailing: const Icon(Icons.open_in_new, size: 16, color: Colors.grey),
+      onTap: onTap,
+    );
+  }
+
   Widget _buildAboutTile() {
     return ListTile(
       leading: const Icon(Icons.info_outline, color: AppTheme.accentGold),
@@ -369,6 +376,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
           Text(
             '${_getTranslation('developer')}: ${AppConstants.developer}',
             style: const TextStyle(fontSize: 14),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            _getTranslation('all_rights_reserved'),
+            style: const TextStyle(
+              fontSize: 12,
+              color: Colors.grey,
+            ),
           ),
         ],
       ),
@@ -456,7 +471,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
       
       if (line.trim() == 'Telegram-канал' ||
           line.trim() == 'Чат Telegram' ||
-          line.trim() == 'GitHub' ||
           line.trim() == 'Telegram Channel' ||
           line.trim() == 'Telegram Chat') {
         String url = '';
@@ -464,8 +478,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           url = AppConstants.telegramChannel;
         } else if (line.trim() == 'Чат Telegram' || line.trim() == 'Telegram Chat') {
           url = AppConstants.telegramChat;
-        } else if (line.trim() == 'GitHub') {
-          url = AppConstants.githubRepo;
         }
         widgets.add(
           Padding(
@@ -528,6 +540,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
               Text(
                 _getTranslation('about_full_text'),
                 style: const TextStyle(fontSize: 14, height: 1.6),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                _getTranslation('all_rights_reserved'),
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey,
+                ),
               ),
             ],
           ),
