@@ -178,7 +178,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _buildAboutTile(),
           _buildSectionHeader(_getTranslation('where_to_download')),
           _buildDownloadTile(
-            icon: Icons.store,
+            icon: Icons.storefront,
             title: 'RuStore',
             onTap: () => _openLink('https://www.rustore.ru/'),
           ),
@@ -326,7 +326,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return ListTile(
       leading: Icon(icon, color: AppTheme.accentGold),
       title: Text(title),
-      trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+      trailing: const Icon(Icons.open_in_new, size: 16, color: Colors.grey),
       onTap: onTap,
     );
   }
@@ -392,7 +392,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            '© ${_getTranslation('all_rights_reserved')}',
+            '© ${DateTime.now().year} ${AppConstants.developer} ${_getTranslation('all_rights_reserved')}',
             style: const TextStyle(
               fontSize: 12,
               color: Colors.grey,
