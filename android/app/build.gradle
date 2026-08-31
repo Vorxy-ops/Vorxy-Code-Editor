@@ -21,7 +21,7 @@ android {
         applicationId "com.vorxy.code_editor"
         minSdk 24
         targetSdk 36
-        versionCode 1
+        versionCode 377
         versionName "3.7.7"
         multiDexEnabled true
     }
@@ -32,9 +32,18 @@ android {
         }
     }
 
+    signingConfigs {
+        release {
+            storeFile file("Vorxy-Code-Editor.p12")
+            storePassword "Fotopd53628"
+            keyAlias "Vorxy Code Editor"
+            keyPassword "Fotopd53628"
+        }
+    }
+
     buildTypes {
         release {
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt')
         }
