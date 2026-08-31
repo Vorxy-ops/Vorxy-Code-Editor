@@ -56,9 +56,16 @@ Vorxy Code Editor — это мобильная среда разработки 
 
 ## Контакты
 
-- Telegram-канал: https://t.me/VorxyCodeEditor
-- Telegram-чат: https://t.me/VorxyCodeEditorChat
-- GitHub: https://github.com/Vorxy-ops/Vorxy-Code-Editor.git
+- [Telegram-канал](https://t.me/VorxyCodeEditor)
+- [Чат Telegram](https://t.me/VorxyCodeEditorChat)
+
+---
+
+## Где скачать
+
+- RuStore: https://www.rustore.ru/
+- GitHub: https://github.com/Vorxy-ops/Vorxy-Code-Editor
+- itch.io: https://vorxy-ops.itch.io
 
 ---
 
@@ -120,7 +127,6 @@ Vorxy Code Editor — это мобильная среда разработки 
 
 [Telegram-канал](https://t.me/VorxyCodeEditor)
 [Чат Telegram](https://t.me/VorxyCodeEditorChat)
-[GitHub](https://github.com/Vorxy-ops/Vorxy-Code-Editor.git)
 
 ---
 
@@ -174,4 +180,3 @@ Vorxy Code Editor — это мобильная среда разработки 
 
 [Telegram-канал](https://t.me/VorxyCodeEditor)
 [Чат Telegram](https://t.me/VorxyCodeEditorChat)
-[GitHub](https://github.com/Vorxy-ops/Vorxy-Code-Editor.git)
