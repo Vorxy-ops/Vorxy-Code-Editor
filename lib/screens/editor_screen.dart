@@ -158,18 +158,29 @@ class _EditorScreenState extends State<EditorScreen> with AutomaticKeepAliveClie
     final String rustoreUrl = 'https://www.rustore.ru';
     final String itchIoUrl = 'https://vorxy-ops.itch.io';
 
+    final bool isRussian = widget.currentLanguage == 'ru';
+    final String whereToDownload = isRussian ? 'Где скачать' : 'Where to download';
+    final String contacts = isRussian ? 'Контакты' : 'Contacts';
+    final String telegramChannelLabel = isRussian ? 'Telegram-канал' : 'Telegram Channel';
+    final String telegramChatLabel = isRussian ? 'Чат Telegram' : 'Telegram Chat';
+    final String lineLabel = isRussian ? 'строк' : 'lines';
+    final String charsLabel = isRussian ? 'симв.' : 'chars';
+
     final String message = '''
 Vorxy Code Editor v$version
 developed by $developer
 
-${_getTranslation('where_to_download')}
-RuStore GitHub itch.io
+$whereToDownload
+RuStore: $rustoreUrl
+GitHub: $githubRepo
+itch.io: $itchIoUrl
 
-${_getTranslation('contacts')}
-Telegram-канал Чат Telegram
+$contacts
+$telegramChannelLabel: $telegramChannel
+$telegramChatLabel: $telegramChat
 
 $lang
-$lines ${_getTranslation('line')}, $chars ${_getTranslation('chars')}
+$lines $lineLabel, $chars $charsLabel
 $_code
 ''';
 
