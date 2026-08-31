@@ -139,6 +139,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
+  Future<void> _openItchIo() async {
+    final List<Uri> uris = [
+      Uri.parse('https://vorxy-ops.itch.io'),
+    ];
+    for (final uri in uris) {
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+        return;
+      }
+    }
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${_getTranslation('cannot_open_link')} https://vorxy-ops.itch.io'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+    }
+  }
+
   Future<void> _exitApp() async {
     final result = await showDialog<bool>(
       context: context,
@@ -180,7 +200,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _buildIconTile(
             icon: Icons.store,
             title: 'RuStore',
-            onTap: () => _openLink('https://www.rustore.ru/'),
+            onTap: () => _openLink('https://www.rustore.ru'),
             showArrow: true,
           ),
           _buildIconTile(
@@ -192,7 +212,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _buildIconTile(
             icon: Icons.gamepad,
             title: 'itch.io',
-            onTap: () => _openLink('https://vorxy-ops.itch.io/vorxy-code-editor'),
+            onTap: _openItchIo,
             showArrow: true,
           ),
           _buildSectionHeader(_getTranslation('contacts')),
