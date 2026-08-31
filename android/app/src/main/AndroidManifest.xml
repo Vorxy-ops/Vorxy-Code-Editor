@@ -34,8 +34,7 @@
         android:label="Vorxy Code Editor"
         android:name="${applicationName}"
         android:usesCleartextTraffic="true"
-        android:requestLegacyExternalStorage="true"
-        android:icon="@mipmap/ic_launcher">
+        android:requestLegacyExternalStorage="true">
 
         <meta-data
             android:name="flutterEmbedding"
