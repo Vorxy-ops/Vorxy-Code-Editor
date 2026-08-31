@@ -54,11 +54,18 @@ The application is designed for programmers, students and anyone who wants to ha
 
 ---
 
+## Where to download
+
+- RuStore: https://www.rustore.ru/
+- GitHub: https://github.com/Vorxy-ops/Vorxy-Code-Editor
+- itch.io: https://vorxy-ops.itch.io
+
+---
+
 ## Contacts
 
 - Telegram channel: https://t.me/VorxyCodeEditor
 - Telegram chat: https://t.me/VorxyCodeEditorChat
-- GitHub: https://github.com/Vorxy-ops/Vorxy-Code-Editor.git
 
 ---
 
@@ -118,9 +125,8 @@ We reserve the right to update this Privacy Policy.
 
 9. Contacts.
 
-[Telegram Channel](https://t.me/VorxyCodeEditor)
-[Telegram Chat](https://t.me/VorxyCodeEditorChat)
-[GitHub](https://github.com/Vorxy-ops/Vorxy-Code-Editor.git)
+Telegram Channel
+Telegram Chat
 
 ---
 
@@ -172,6 +178,5 @@ All disputes are resolved in accordance with the legislation of the country of r
 
 8. Contacts.
 
-[Telegram Channel](https://t.me/VorxyCodeEditor)
-[Telegram Chat](https://t.me/VorxyCodeEditorChat)
-[GitHub](https://github.com/Vorxy-ops/Vorxy-Code-Editor.git)
+Telegram Channel
+Telegram Chat
