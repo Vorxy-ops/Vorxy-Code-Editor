@@ -54,18 +54,18 @@ The application is designed for programmers, students and anyone who wants to ha
 
 ---
 
+## Contacts
+
+- Telegram channel: https://t.me/VorxyCodeEditor
+- Telegram chat: https://t.me/VorxyCodeEditorChat
+
+---
+
 ## Where to download
 
 - RuStore: https://www.rustore.ru/
 - GitHub: https://github.com/Vorxy-ops/Vorxy-Code-Editor
 - itch.io: https://vorxy-ops.itch.io
-
----
-
-## Contacts
-
-- Telegram channel: https://t.me/VorxyCodeEditor
-- Telegram chat: https://t.me/VorxyCodeEditorChat
 
 ---
 
