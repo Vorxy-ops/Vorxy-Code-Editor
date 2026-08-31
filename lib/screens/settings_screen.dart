@@ -177,28 +177,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _buildSectionHeader(_getTranslation('about_app')),
           _buildAboutTile(),
           _buildSectionHeader(_getTranslation('where_to_download')),
-          _buildDownloadTile(
-            icon: Icons.storefront,
+          _buildIconTile(
+            icon: Icons.store,
             title: 'RuStore',
             onTap: () => _openLink('https://www.rustore.ru/'),
           ),
-          _buildDownloadTile(
+          _buildIconTile(
             icon: Icons.code,
-            title: 'GitHub',
-            onTap: () => _openLink('https://github.com/Vorxy-ops/Vorxy-Code-Editor'),
+            title: _getTranslation('github'),
+            onTap: () => _openLink(AppConstants.githubRepo),
           ),
-          _buildDownloadTile(
+          _buildIconTile(
             icon: Icons.gamepad,
             title: 'itch.io',
             onTap: () => _openLink('https://vorxy-ops.itch.io/vorxy-code-editor'),
           ),
           _buildSectionHeader(_getTranslation('contacts')),
-          _buildContactTile(
+          _buildIconTile(
             icon: Icons.telegram,
             title: _getTranslation('telegram_channel'),
             onTap: _openTelegramChannel,
           ),
-          _buildContactTile(
+          _buildIconTile(
             icon: Icons.chat,
             title: _getTranslation('telegram_chat'),
             onTap: _openTelegramChat,
@@ -331,32 +331,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _buildDownloadTile({
-    required IconData icon,
-    required String title,
-    required VoidCallback onTap,
-  }) {
-    return ListTile(
-      leading: Icon(icon, color: AppTheme.accentGold),
-      title: Text(title),
-      trailing: const Icon(Icons.open_in_new, size: 16, color: Colors.grey),
-      onTap: onTap,
-    );
-  }
-
-  Widget _buildContactTile({
-    required IconData icon,
-    required String title,
-    required VoidCallback onTap,
-  }) {
-    return ListTile(
-      leading: Icon(icon, color: AppTheme.accentGold),
-      title: Text(title),
-      trailing: const Icon(Icons.open_in_new, size: 16, color: Colors.grey),
-      onTap: onTap,
-    );
-  }
-
   Widget _buildAboutTile() {
     return ListTile(
       leading: const Icon(Icons.info_outline, color: AppTheme.accentGold),
@@ -392,7 +366,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            '© ${DateTime.now().year} ${AppConstants.developer} ${_getTranslation('all_rights_reserved')}',
+            '© 2026 ${AppConstants.developer}. ${_getTranslation('all_rights_reserved')}',
             style: const TextStyle(
               fontSize: 12,
               color: Colors.grey,
