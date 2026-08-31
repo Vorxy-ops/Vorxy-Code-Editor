@@ -67,10 +67,22 @@ class _HomeScreenState extends State<HomeScreen> {
         currentIndex: _selectedIndex,
         onTap: (index) => setState(() => _selectedIndex = index),
         items: [
-          BottomNavigationBarItem(icon: const Icon(Icons.code), label: _getTranslation('languages')),
-          BottomNavigationBarItem(icon: const Icon(Icons.edit), label: _getTranslation('editor')),
-          BottomNavigationBarItem(icon: const Icon(Icons.folder), label: _getTranslation('files')),
-          BottomNavigationBarItem(icon: const Icon(Icons.settings), label: _getTranslation('settings')),
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.description),
+            label: _getTranslation('languages'),
+          ),
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.code),
+            label: _getTranslation('editor'),
+          ),
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.folder),
+            label: _getTranslation('files'),
+          ),
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.settings),
+            label: _getTranslation('settings'),
+          ),
         ],
       ),
     );
