@@ -56,8 +56,8 @@ The application is designed for programmers, students and anyone who wants to ha
 
 ## Contacts
 
-- Telegram channel: https://t.me/VorxyCodeEditor
-- Telegram chat: https://t.me/VorxyCodeEditorChat
+- [Telegram Channel](https://t.me/VorxyCodeEditor)
+- [Telegram Chat](https://t.me/VorxyCodeEditorChat)
 
 ---
 
@@ -125,8 +125,8 @@ We reserve the right to update this Privacy Policy.
 
 9. Contacts.
 
-Telegram Channel
-Telegram Chat
+[Telegram Channel](https://t.me/VorxyCodeEditor)
+[Telegram Chat](https://t.me/VorxyCodeEditorChat)
 
 ---
 
@@ -178,5 +178,5 @@ All disputes are resolved in accordance with the legislation of the country of r
 
 8. Contacts.
 
-Telegram Channel
-Telegram Chat
+[Telegram Channel](https://t.me/VorxyCodeEditor)
+[Telegram Chat](https://t.me/VorxyCodeEditorChat)
