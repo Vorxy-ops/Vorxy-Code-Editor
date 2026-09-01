@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_highlight/flutter_highlight.dart';
-import 'package:flutter_highlight/themes/vs.dart';
+import 'package:lite_code_editor/lite_code_editor.dart';
 import '../utils/theme.dart';
 import '../utils/constants.dart';
 
@@ -23,13 +22,10 @@ class CodeEditorWidget extends StatefulWidget {
 }
 
 class _CodeEditorWidgetState extends State<CodeEditorWidget> {
-  late TextEditingController _controller;
+  late CodeController _controller;
   final FocusNode _focusNode = FocusNode();
   String _displayCode = '';
   bool _isProcessing = false;
-  ScrollController _scrollController = ScrollController();
-  ScrollController _lineScrollController = ScrollController();
-  ScrollController _verticalScrollController = ScrollController();
   int _cursorPosition = 0;
 
   String _getTranslation(String key) {
@@ -40,11 +36,12 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
   @override
   void initState() {
     super.initState();
-    _controller = TextEditingController(text: widget.code);
+    _controller = CodeController(text: widget.code);
     _displayCode = widget.code;
     _controller.addListener(() {
       setState(() {
         _cursorPosition = _controller.selection.baseOffset;
+        _displayCode = _controller.text;
       });
     });
   }
@@ -53,13 +50,8 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
   void didUpdateWidget(CodeEditorWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.code != widget.code) {
-      final currentSelection = _controller.selection;
       _controller.text = widget.code;
       _displayCode = widget.code;
-      if (currentSelection.isValid) {
-        _controller.selection = currentSelection;
-      }
-      _cursorPosition = _controller.selection.baseOffset;
     }
   }
 
@@ -74,11 +66,6 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
     Future.delayed(const Duration(milliseconds: 50), () {
       _isProcessing = false;
     });
-  }
-
-  List<String> _getLines(String text) {
-    if (text.isEmpty) return [''];
-    return text.split('\n');
   }
 
   String _getLineAndColumn(String text, int position) {
@@ -97,10 +84,26 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
     return '$lines ${_getTranslation('line')}, $chars ${_getTranslation('chars')}';
   }
 
+  String _getLanguageCode(String language) {
+    switch (language) {
+      case 'Python': return 'python';
+      case 'JavaScript': return 'javascript';
+      case 'C': return 'c';
+      case 'C++': return 'cpp';
+      case 'Java': return 'java';
+      case 'C#': return 'csharp';
+      case 'Visual Basic': return 'vb';
+      case 'SQL': return 'sql';
+      case 'R': return 'r';
+      case 'Rust': return 'rust';
+      case 'HTML': return 'html';
+      default: return 'python';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final lines = _getLines(_displayCode);
     final lineAndCol = _getLineAndColumn(_displayCode, _cursorPosition);
     final stats = _getStats(_displayCode);
 
@@ -150,92 +153,17 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
               borderRadius: BorderRadius.circular(8),
               border: Border.all(color: isDark ? Colors.grey.shade800 : Colors.grey.shade400),
             ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  width: _getLineNumberWidth(lines.length),
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  decoration: BoxDecoration(
-                    color: isDark ? Colors.grey.shade900 : Colors.grey.shade200,
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(8),
-                      bottomLeft: Radius.circular(8),
-                    ),
-                  ),
-                  child: ListView.builder(
-                    controller: _lineScrollController,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: lines.length,
-                    shrinkWrap: true,
-                    itemBuilder: (context, index) {
-                      return Container(
-                        height: 22,
-                        alignment: Alignment.centerRight,
-                        padding: const EdgeInsets.only(right: 8),
-                        child: Text(
-                          '${index + 1}',
-                          style: TextStyle(
-                            fontSize: _getNumberFontSize(lines.length),
-                            fontFamily: 'monospace',
-                            color: isDark ? Colors.grey.shade600 : Colors.grey.shade700,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                Expanded(
-                  child: Stack(
-                    children: [
-                      SingleChildScrollView(
-                        scrollDirection: Axis.vertical,
-                        controller: _verticalScrollController,
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          controller: _scrollController,
-                          child: HighlightView(
-                            _displayCode.isEmpty ? _getTranslation('code_ready') : _displayCode,
-                            language: widget.language.toLowerCase(),
-                            theme: isDark ? _getDarkTheme() : _getLightTheme(),
-                            padding: const EdgeInsets.all(12),
-                            textStyle: TextStyle(
-                              fontSize: 14,
-                              fontFamily: 'monospace',
-                              color: isDark ? Colors.white : Colors.black,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned.fill(
-                        child: TextField(
-                          controller: _controller,
-                          focusNode: _focusNode,
-                          maxLines: null,
-                          minLines: null,
-                          expands: true,
-                          style: TextStyle(
-                            color: Colors.transparent,
-                            fontSize: 14,
-                            fontFamily: 'monospace',
-                            height: 1.0,
-                          ),
-                          decoration: const InputDecoration(
-                            border: InputBorder.none,
-                            contentPadding: EdgeInsets.all(12),
-                          ),
-                          onChanged: _onCodeChanged,
-                          onTap: () {
-                            setState(() {
-                              _cursorPosition = _controller.selection.baseOffset;
-                            });
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+            child: LiteCodeEditor(
+              controller: _controller,
+              language: _getLanguageCode(widget.language),
+              theme: isDark ? EditorTheme.dark() : EditorTheme.light(),
+              onChanged: _onCodeChanged,
+              enableGutter: true,
+              readOnly: false,
+              wrap: false,
+              maxLines: null,
+              padding: const EdgeInsets.all(12),
+              autocomplete: true,
             ),
           ),
         ),
@@ -252,68 +180,10 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
     return 8;
   }
 
-  double _getNumberFontSize(int count) {
-    if (count <= 99) return 13;
-    if (count <= 999) return 12;
-    if (count <= 9999) return 11;
-    return 10;
-  }
-
-  double _getLineNumberWidth(int count) {
-    if (count <= 9) return 30;
-    if (count <= 99) return 35;
-    if (count <= 999) return 40;
-    if (count <= 9999) return 45;
-    return 50;
-  }
-
-  Map<String, TextStyle> _getDarkTheme() {
-    return {
-      'root': TextStyle(
-        backgroundColor: Colors.black,
-        color: Colors.white,
-        fontSize: 14,
-        fontFamily: 'monospace',
-      ),
-      'keyword': TextStyle(color: Colors.purple.shade300),
-      'string': TextStyle(color: Colors.green.shade300),
-      'comment': TextStyle(color: Colors.grey.shade600, fontStyle: FontStyle.italic),
-      'number': TextStyle(color: Colors.blue.shade300),
-      'function': TextStyle(color: Colors.yellow.shade300),
-      'class': TextStyle(color: Colors.orange.shade300),
-      'variable': TextStyle(color: Colors.cyan.shade300),
-      'operator': TextStyle(color: Colors.red.shade300),
-      'built_in': TextStyle(color: Colors.teal.shade300),
-    };
-  }
-
-  Map<String, TextStyle> _getLightTheme() {
-    return {
-      'root': TextStyle(
-        backgroundColor: Colors.white,
-        color: Colors.black,
-        fontSize: 14,
-        fontFamily: 'monospace',
-      ),
-      'keyword': TextStyle(color: Colors.purple.shade700),
-      'string': TextStyle(color: Colors.green.shade700),
-      'comment': TextStyle(color: Colors.grey.shade500, fontStyle: FontStyle.italic),
-      'number': TextStyle(color: Colors.blue.shade700),
-      'function': TextStyle(color: Colors.orange.shade700),
-      'class': TextStyle(color: Colors.deepPurple.shade700),
-      'variable': TextStyle(color: Colors.cyan.shade700),
-      'operator': TextStyle(color: Colors.red.shade700),
-      'built_in': TextStyle(color: Colors.teal.shade700),
-    };
-  }
-
   @override
   void dispose() {
     _controller.dispose();
     _focusNode.dispose();
-    _scrollController.dispose();
-    _lineScrollController.dispose();
-    _verticalScrollController.dispose();
     super.dispose();
   }
 }
