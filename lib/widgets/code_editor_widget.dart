@@ -193,6 +193,7 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
                         scrollDirection: Axis.horizontal,
                         controller: _scrollController,
                         child: Stack(
+                          clipBehavior: Clip.none,
                           children: [
                             HighlightView(
                               _displayCode.isEmpty ? _getTranslation('code_ready') : _displayCode,
@@ -216,12 +217,14 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
                                   color: Colors.transparent,
                                   fontSize: 14,
                                   fontFamily: 'monospace',
+                                  height: 1.0,
                                 ),
                                 decoration: const InputDecoration(
                                   border: InputBorder.none,
                                   filled: true,
                                   fillColor: Colors.transparent,
                                   hintStyle: TextStyle(color: Colors.transparent),
+                                  contentPadding: EdgeInsets.all(12),
                                 ),
                                 onChanged: _onCodeChanged,
                                 onTap: () {
