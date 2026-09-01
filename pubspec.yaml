@@ -17,7 +17,7 @@ dependencies:
   file_picker: ^10.3.10
   permission_handler: ^11.3.1
   share_plus: ^10.1.4
-  lite_code_editor: ^0.1.1
+  code_field: ^0.2.0
 
 dev_dependencies:
   flutter_test:
