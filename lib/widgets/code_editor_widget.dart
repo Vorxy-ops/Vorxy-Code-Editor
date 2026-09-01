@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:code_field/code_field.dart';
+import 'package:code_editor/code_editor.dart';
 import '../utils/theme.dart';
 import '../utils/constants.dart';
 
@@ -22,7 +22,7 @@ class CodeEditorWidget extends StatefulWidget {
 }
 
 class _CodeEditorWidgetState extends State<CodeEditorWidget> {
-  late CodeController _controller;
+  late EditorController _controller;
   final FocusNode _focusNode = FocusNode();
   String _displayCode = '';
   int _cursorPosition = 0;
@@ -35,7 +35,10 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
   @override
   void initState() {
     super.initState();
-    _controller = CodeController(text: widget.code);
+    _controller = EditorController(
+      text: widget.code,
+      language: _getLanguageMode(widget.language),
+    );
     _displayCode = widget.code;
     _controller.addListener(() {
       setState(() {
@@ -83,7 +86,7 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
     return '$lines ${_getTranslation('line')}, $chars ${_getTranslation('chars')}';
   }
 
-  String _getLanguageCode(String language) {
+  String _getLanguageMode(String language) {
     switch (language) {
       case 'Python': return 'python';
       case 'JavaScript': return 'javascript';
@@ -152,14 +155,31 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
               borderRadius: BorderRadius.circular(8),
               border: Border.all(color: isDark ? Colors.grey.shade800 : Colors.grey.shade400),
             ),
-            child: CodeField(
+            child: CodeEditor(
               controller: _controller,
-              language: _getLanguageCode(widget.language),
-              wrap: false,
+              language: _getLanguageMode(widget.language),
               readOnly: false,
               fontSize: 14,
               padding: const EdgeInsets.all(12),
               placeholder: _getTranslation('code_ready'),
+              expand: true,
+              theme: CodeEditorTheme(
+                backgroundColor: isDark ? Colors.black : Colors.white,
+                textStyle: TextStyle(
+                  color: isDark ? Colors.white : Colors.black,
+                  fontSize: 14,
+                  fontFamily: 'monospace',
+                ),
+                gutterStyle: GutterStyle(
+                  textStyle: TextStyle(
+                    color: isDark ? Colors.grey.shade600 : Colors.grey.shade700,
+                    fontSize: 13,
+                    fontFamily: 'monospace',
+                  ),
+                  backgroundColor: isDark ? Colors.grey.shade900 : Colors.grey.shade200,
+                  width: 40,
+                ),
+              ),
             ),
           ),
         ),
