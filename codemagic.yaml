@@ -13,6 +13,11 @@ workflows:
           rm -rf android/app/build
       - name: Install dependencies
         script: flutter pub get
+      - name: Generate icons
+        script: |
+          if [ -f "pubspec.yaml" ] && grep -q "flutter_launcher_icons" pubspec.yaml; then
+            dart run flutter_launcher_icons || true
+          fi
       - name: Build APK
         script: |
           flutter build apk --release --no-tree-shake-icons
