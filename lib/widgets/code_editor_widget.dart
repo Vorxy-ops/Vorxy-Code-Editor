@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lite_code_editor/lite_code_editor.dart';
+import 'package:code_field/code_field.dart';
 import '../utils/theme.dart';
 import '../utils/constants.dart';
 
@@ -25,7 +25,6 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
   late CodeController _controller;
   final FocusNode _focusNode = FocusNode();
   String _displayCode = '';
-  bool _isProcessing = false;
   int _cursorPosition = 0;
 
   String _getTranslation(String key) {
@@ -50,22 +49,22 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
   void didUpdateWidget(CodeEditorWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.code != widget.code) {
+      final currentSelection = _controller.selection;
       _controller.text = widget.code;
       _displayCode = widget.code;
+      if (currentSelection.isValid) {
+        _controller.selection = currentSelection;
+      }
+      _cursorPosition = _controller.selection.baseOffset;
     }
   }
 
   void _onCodeChanged(String value) {
-    if (_isProcessing) return;
-    _isProcessing = true;
     setState(() {
       _displayCode = value;
       _cursorPosition = _controller.selection.baseOffset;
     });
     widget.onCodeChanged(value);
-    Future.delayed(const Duration(milliseconds: 50), () {
-      _isProcessing = false;
-    });
   }
 
   String _getLineAndColumn(String text, int position) {
@@ -153,17 +152,14 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
               borderRadius: BorderRadius.circular(8),
               border: Border.all(color: isDark ? Colors.grey.shade800 : Colors.grey.shade400),
             ),
-            child: LiteCodeEditor(
+            child: CodeField(
               controller: _controller,
               language: _getLanguageCode(widget.language),
-              theme: isDark ? EditorTheme.dark() : EditorTheme.light(),
-              onChanged: _onCodeChanged,
-              enableGutter: true,
-              readOnly: false,
               wrap: false,
-              maxLines: null,
+              readOnly: false,
+              fontSize: 14,
               padding: const EdgeInsets.all(12),
-              autocomplete: true,
+              placeholder: _getTranslation('code_ready'),
             ),
           ),
         ),
