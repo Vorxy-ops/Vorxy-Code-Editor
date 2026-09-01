@@ -29,6 +29,7 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
   bool _isProcessing = false;
   ScrollController _scrollController = ScrollController();
   ScrollController _lineScrollController = ScrollController();
+  ScrollController _verticalScrollController = ScrollController();
   int _cursorPosition = 0;
 
   String _getTranslation(String key) {
@@ -185,50 +186,54 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
                     ),
                   ),
                   Expanded(
-                    child: Stack(
-                      children: [
-                        SingleChildScrollView(
-                          controller: _scrollController,
-                          scrollDirection: Axis.horizontal,
-                          child: HighlightView(
-                            _displayCode.isEmpty ? _getTranslation('code_ready') : _displayCode,
-                            language: widget.language.toLowerCase(),
-                            theme: isDark ? _getDarkTheme() : _getLightTheme(),
-                            padding: const EdgeInsets.all(12),
-                            textStyle: TextStyle(
-                              fontSize: 14,
-                              fontFamily: 'monospace',
-                              color: isDark ? Colors.white : Colors.black,
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.vertical,
+                      controller: _verticalScrollController,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        controller: _scrollController,
+                        child: Stack(
+                          children: [
+                            HighlightView(
+                              _displayCode.isEmpty ? _getTranslation('code_ready') : _displayCode,
+                              language: widget.language.toLowerCase(),
+                              theme: isDark ? _getDarkTheme() : _getLightTheme(),
+                              padding: const EdgeInsets.all(12),
+                              textStyle: TextStyle(
+                                fontSize: 14,
+                                fontFamily: 'monospace',
+                                color: isDark ? Colors.white : Colors.black,
+                              ),
                             ),
-                          ),
+                            Positioned.fill(
+                              child: TextField(
+                                controller: _controller,
+                                focusNode: _focusNode,
+                                maxLines: null,
+                                minLines: null,
+                                expands: true,
+                                style: TextStyle(
+                                  color: Colors.transparent,
+                                  fontSize: 14,
+                                  fontFamily: 'monospace',
+                                ),
+                                decoration: const InputDecoration(
+                                  border: InputBorder.none,
+                                  filled: true,
+                                  fillColor: Colors.transparent,
+                                  hintStyle: TextStyle(color: Colors.transparent),
+                                ),
+                                onChanged: _onCodeChanged,
+                                onTap: () {
+                                  setState(() {
+                                    _cursorPosition = _controller.selection.baseOffset;
+                                  });
+                                },
+                              ),
+                            ),
+                          ],
                         ),
-                        Positioned.fill(
-                          child: TextField(
-                            controller: _controller,
-                            focusNode: _focusNode,
-                            maxLines: null,
-                            minLines: null,
-                            expands: true,
-                            style: TextStyle(
-                              color: Colors.transparent,
-                              fontSize: 14,
-                              fontFamily: 'monospace',
-                            ),
-                            decoration: const InputDecoration(
-                              border: InputBorder.none,
-                              filled: true,
-                              fillColor: Colors.transparent,
-                              hintStyle: TextStyle(color: Colors.transparent),
-                            ),
-                            onChanged: _onCodeChanged,
-                            onTap: () {
-                              setState(() {
-                                _cursorPosition = _controller.selection.baseOffset;
-                              });
-                            },
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ),
                 ],
@@ -310,6 +315,7 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
     _focusNode.dispose();
     _scrollController.dispose();
     _lineScrollController.dispose();
+    _verticalScrollController.dispose();
     super.dispose();
   }
 }
