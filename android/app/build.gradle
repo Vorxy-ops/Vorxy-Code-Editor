@@ -34,16 +34,16 @@ android {
 
     signingConfigs {
         release {
-            storeFile file("vorxy-keystore.jks")
+            storeFile file("vorxy-code-editor.jks")
             storePassword "ваш_пароль"
-            keyAlias "vorxy"
+            keyAlias "vorxy code editor"
             keyPassword "ваш_пароль"
         }
     }
 
     buildTypes {
         release {
-            signingConfig signingConfigs.release
+            signingConfig signingConfigs.debug
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt')
         }
