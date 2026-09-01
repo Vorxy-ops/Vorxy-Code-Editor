@@ -34,10 +34,10 @@ android {
 
     signingConfigs {
         release {
-            storeFile file("Vorxy-Code-Editor.p12")
-            storePassword "Fotopd53628"
-            keyAlias "Vorxy Code Editor"
-            keyPassword "Fotopd53628"
+            storeFile file("vorxy-keystore.jks")
+            storePassword "ваш_пароль"
+            keyAlias "vorxy"
+            keyPassword "ваш_пароль"
         }
     }
 
