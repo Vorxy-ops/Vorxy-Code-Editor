@@ -35,9 +35,9 @@ android {
     signingConfigs {
         release {
             storeFile file("vorxy-code-editor.jks")
-            storePassword "ваш_пароль"
+            storePassword "hvf8Ozq2t8X5Id03y"
             keyAlias "vorxy code editor"
-            keyPassword "ваш_пароль"
+            keyPassword "hvf8Ozq2t8X5Id03y"
         }
     }
 
