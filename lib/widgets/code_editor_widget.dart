@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_highlight/flutter_highlight.dart';
-import 'package:flutter_highlight/themes/vs.dart';
+import 'package:re_editor/re_editor.dart';
+import 'package:re_highlight/re_highlight.dart';
 import '../utils/theme.dart';
 import '../utils/constants.dart';
 
@@ -23,14 +23,12 @@ class CodeEditorWidget extends StatefulWidget {
 }
 
 class _CodeEditorWidgetState extends State<CodeEditorWidget> {
-  late TextEditingController _controller;
+  late CodeLineEditingController _controller;
+  late CodeFindController _findController;
   final FocusNode _focusNode = FocusNode();
   String _displayCode = '';
-  bool _isProcessing = false;
-  ScrollController _scrollController = ScrollController();
-  ScrollController _lineScrollController = ScrollController();
-  ScrollController _verticalScrollController = ScrollController();
   int _cursorPosition = 0;
+  bool _showFindBar = false;
 
   String _getTranslation(String key) {
     final translations = AppConstants.translations[widget.currentLanguage] ?? AppConstants.translations['ru']!;
@@ -40,11 +38,22 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
   @override
   void initState() {
     super.initState();
-    _controller = TextEditingController(text: widget.code);
+    _controller = CodeLineEditingController(
+      text: widget.code,
+      language: _getLanguageMode(widget.language),
+    );
+    _findController = CodeFindController();
     _displayCode = widget.code;
     _controller.addListener(() {
       setState(() {
         _cursorPosition = _controller.selection.baseOffset;
+        _displayCode = _controller.text;
+      });
+      widget.onCodeChanged(_controller.text);
+    });
+    _findController.addListener(() {
+      setState(() {
+        _showFindBar = _findController.isShowing;
       });
     });
   }
@@ -61,24 +70,9 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
       }
       _cursorPosition = _controller.selection.baseOffset;
     }
-  }
-
-  void _onCodeChanged(String value) {
-    if (_isProcessing) return;
-    _isProcessing = true;
-    setState(() {
-      _displayCode = value;
-      _cursorPosition = _controller.selection.baseOffset;
-    });
-    widget.onCodeChanged(value);
-    Future.delayed(const Duration(milliseconds: 50), () {
-      _isProcessing = false;
-    });
-  }
-
-  List<String> _getLines(String text) {
-    if (text.isEmpty) return [''];
-    return text.split('\n');
+    if (oldWidget.language != widget.language) {
+      _controller.language = _getLanguageMode(widget.language);
+    }
   }
 
   String _getLineAndColumn(String text, int position) {
@@ -97,10 +91,37 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
     return '$lines ${_getTranslation('line')}, $chars ${_getTranslation('chars')}';
   }
 
+  String _getLanguageMode(String language) {
+    switch (language) {
+      case 'Python': return 'python';
+      case 'JavaScript': return 'javascript';
+      case 'C': return 'c';
+      case 'C++': return 'cpp';
+      case 'Java': return 'java';
+      case 'C#': return 'csharp';
+      case 'Visual Basic': return 'vb';
+      case 'SQL': return 'sql';
+      case 'R': return 'r';
+      case 'Rust': return 'rust';
+      case 'HTML': return 'html';
+      default: return 'python';
+    }
+  }
+
+  void _toggleFindBar() {
+    if (_findController.isShowing) {
+      _findController.close();
+    } else {
+      _findController.find(
+        mode: CodeFindMode.search,
+        input: '',
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final lines = _getLines(_displayCode);
     final lineAndCol = _getLineAndColumn(_displayCode, _cursorPosition);
     final stats = _getStats(_displayCode);
 
@@ -118,10 +139,23 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
                 fontWeight: FontWeight.w500,
               ),
             ),
-            const Spacer(),
-            Text(
-              lineAndCol,
-              style: const TextStyle(color: Colors.grey, fontSize: 12),
+            Row(
+              children: [
+                IconButton(
+                  icon: Icon(
+                    Icons.search,
+                    color: AppTheme.accentGold,
+                    size: 20,
+                  ),
+                  onPressed: _toggleFindBar,
+                  tooltip: _getTranslation('search'),
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  lineAndCol,
+                  style: const TextStyle(color: Colors.grey, fontSize: 12),
+                ),
+              ],
             ),
           ],
         ),
@@ -144,104 +178,89 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
         ),
         const SizedBox(height: 8),
         Expanded(
-          child: GestureDetector(
-            onTap: () {
-              FocusScope.of(context).requestFocus(_focusNode);
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                color: isDark ? Colors.black : Colors.white,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: isDark ? Colors.grey.shade800 : Colors.grey.shade400),
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+          child: Container(
+            decoration: BoxDecoration(
+              color: isDark ? Colors.black : Colors.white,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: isDark ? Colors.grey.shade800 : Colors.grey.shade400),
+            ),
+            child: Column(
+              children: [
+                if (_showFindBar)
                   Container(
-                    width: _getLineNumberWidth(lines.length),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                     decoration: BoxDecoration(
                       color: isDark ? Colors.grey.shade900 : Colors.grey.shade200,
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(8),
-                        bottomLeft: Radius.circular(8),
+                      border: Border(
+                        bottom: BorderSide(color: isDark ? Colors.grey.shade800 : Colors.grey.shade300),
                       ),
                     ),
-                    child: ListView.builder(
-                      controller: _lineScrollController,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: lines.length,
-                      shrinkWrap: true,
-                      itemBuilder: (context, index) {
-                        return Container(
-                          height: 22,
-                          alignment: Alignment.centerRight,
-                          padding: const EdgeInsets.only(right: 8),
-                          child: Text(
-                            '${index + 1}',
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            decoration: InputDecoration(
+                              hintText: _getTranslation('search_hint'),
+                              border: InputBorder.none,
+                              isDense: true,
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+                            ),
                             style: TextStyle(
-                              fontSize: _getNumberFontSize(lines.length),
-                              fontFamily: 'monospace',
-                              color: isDark ? Colors.grey.shade600 : Colors.grey.shade700,
+                              color: isDark ? Colors.white : Colors.black,
+                              fontSize: 13,
                             ),
+                            onChanged: (value) {
+                              _findController.find(
+                                mode: CodeFindMode.search,
+                                input: value,
+                              );
+                            },
                           ),
-                        );
-                      },
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.close, size: 18),
+                          onPressed: () {
+                            _findController.close();
+                            setState(() {
+                              _showFindBar = false;
+                            });
+                          },
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                        ),
+                      ],
                     ),
                   ),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.vertical,
-                      controller: _verticalScrollController,
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        controller: _scrollController,
-                        child: Stack(
-                          clipBehavior: Clip.none,
-                          children: [
-                            HighlightView(
-                              _displayCode.isEmpty ? _getTranslation('code_ready') : _displayCode,
-                              language: widget.language.toLowerCase(),
-                              theme: isDark ? _getDarkTheme() : _getLightTheme(),
-                              padding: const EdgeInsets.all(12),
-                              textStyle: TextStyle(
-                                fontSize: 14,
-                                fontFamily: 'monospace',
-                                color: isDark ? Colors.white : Colors.black,
-                              ),
-                            ),
-                            Positioned.fill(
-                              child: TextField(
-                                controller: _controller,
-                                focusNode: _focusNode,
-                                maxLines: null,
-                                minLines: null,
-                                expands: true,
-                                style: TextStyle(
-                                  color: Colors.transparent,
-                                  fontSize: 14,
-                                  fontFamily: 'monospace',
-                                  height: 1.0,
-                                ),
-                                decoration: const InputDecoration(
-                                  border: InputBorder.none,
-                                  contentPadding: EdgeInsets.all(12),
-                                ),
-                                onChanged: _onCodeChanged,
-                                onTap: () {
-                                  setState(() {
-                                    _cursorPosition = _controller.selection.baseOffset;
-                                  });
-                                },
-                              ),
-                            ),
-                          ],
+                Expanded(
+                  child: CodeEditor(
+                    controller: _controller,
+                    findController: _findController,
+                    focusNode: _focusNode,
+                    padding: const EdgeInsets.all(12),
+                    indicatorBuilder: (context, controller, index) {
+                      return CodeEditorIndicator(
+                        controller: controller,
+                        index: index,
+                        activeLineColor: isDark ? Colors.grey.shade800 : Colors.grey.shade300,
+                        lineNumberStyle: TextStyle(
+                          color: isDark ? Colors.grey.shade600 : Colors.grey.shade700,
+                          fontSize: 12,
                         ),
+                        width: 40,
+                      );
+                    },
+                    theme: CodeEditorTheme(
+                      backgroundColor: isDark ? Colors.black : Colors.white,
+                      textStyle: TextStyle(
+                        color: isDark ? Colors.white : Colors.black,
+                        fontSize: 14,
+                        fontFamily: 'monospace',
                       ),
                     ),
+                    language: _getLanguageMode(widget.language),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
@@ -258,68 +277,11 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
     return 8;
   }
 
-  double _getNumberFontSize(int count) {
-    if (count <= 99) return 13;
-    if (count <= 999) return 12;
-    if (count <= 9999) return 11;
-    return 10;
-  }
-
-  double _getLineNumberWidth(int count) {
-    if (count <= 9) return 30;
-    if (count <= 99) return 35;
-    if (count <= 999) return 40;
-    if (count <= 9999) return 45;
-    return 50;
-  }
-
-  Map<String, TextStyle> _getDarkTheme() {
-    return {
-      'root': TextStyle(
-        backgroundColor: Colors.black,
-        color: Colors.white,
-        fontSize: 14,
-        fontFamily: 'monospace',
-      ),
-      'keyword': TextStyle(color: Colors.purple.shade300),
-      'string': TextStyle(color: Colors.green.shade300),
-      'comment': TextStyle(color: Colors.grey.shade600, fontStyle: FontStyle.italic),
-      'number': TextStyle(color: Colors.blue.shade300),
-      'function': TextStyle(color: Colors.yellow.shade300),
-      'class': TextStyle(color: Colors.orange.shade300),
-      'variable': TextStyle(color: Colors.cyan.shade300),
-      'operator': TextStyle(color: Colors.red.shade300),
-      'built_in': TextStyle(color: Colors.teal.shade300),
-    };
-  }
-
-  Map<String, TextStyle> _getLightTheme() {
-    return {
-      'root': TextStyle(
-        backgroundColor: Colors.white,
-        color: Colors.black,
-        fontSize: 14,
-        fontFamily: 'monospace',
-      ),
-      'keyword': TextStyle(color: Colors.purple.shade700),
-      'string': TextStyle(color: Colors.green.shade700),
-      'comment': TextStyle(color: Colors.grey.shade500, fontStyle: FontStyle.italic),
-      'number': TextStyle(color: Colors.blue.shade700),
-      'function': TextStyle(color: Colors.orange.shade700),
-      'class': TextStyle(color: Colors.deepPurple.shade700),
-      'variable': TextStyle(color: Colors.cyan.shade700),
-      'operator': TextStyle(color: Colors.red.shade700),
-      'built_in': TextStyle(color: Colors.teal.shade700),
-    };
-  }
-
   @override
   void dispose() {
     _controller.dispose();
+    _findController.dispose();
     _focusNode.dispose();
-    _scrollController.dispose();
-    _lineScrollController.dispose();
-    _verticalScrollController.dispose();
     super.dispose();
   }
 }
