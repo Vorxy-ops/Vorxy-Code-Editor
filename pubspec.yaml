@@ -9,8 +9,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_highlight: ^0.7.0
-  highlight: ^0.7.0
+  re_editor: ^1.2.1
+  re_highlight: ^0.2.0
   path_provider: ^2.1.5
   shared_preferences: ^2.5.3
   url_launcher: ^6.3.1
