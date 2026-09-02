@@ -5,7 +5,6 @@ class AppConstants {
   static const String telegramChannel = 'https://t.me/VorxyCodeEditor';
   static const String telegramChat = 'https://t.me/VorxyCodeEditorChat';
   static const String githubRepo = 'https://github.com/Vorxy-ops/Vorxy-Code-Editor';
-  static const String supportEmail = 'vorxygtn@mail.ru';
 
   static const List<Map<String, String>> supportedLanguages = [
     {'code': 'ru', 'name': 'Русский', 'flag': '🇷🇺'},
@@ -80,8 +79,6 @@ class AppConstants {
       'privacy_title': 'Политика конфиденциальности',
       'terms_title': 'Пользовательское соглашение',
       'all_rights_reserved': 'Все права защищены.',
-      'search': 'Поиск',
-      'search_hint': 'Введите текст для поиска...',
       'about_description': 'Vorxy Code Editor — это мобильная среда разработки для устройств на базе Android. Приложение позволяет писать, редактировать, загружать и сохранять код на 10 языках программирования с подсветкой синтаксиса.',
       'about_full_text': 
         'Vorxy Code Editor — это мобильная среда разработки для устройств на базе Android. '
@@ -174,8 +171,6 @@ class AppConstants {
       'privacy_title': 'Privacy Policy',
       'terms_title': 'Terms of Service',
       'all_rights_reserved': 'All rights reserved.',
-      'search': 'Search',
-      'search_hint': 'Enter text to search...',
       'about_description': 'Vorxy Code Editor is a mobile development environment for Android devices. The application allows you to write, edit, load and save code in 10 programming languages with syntax highlighting.',
       'about_full_text':
         'Vorxy Code Editor is a mobile development environment for Android devices. '
