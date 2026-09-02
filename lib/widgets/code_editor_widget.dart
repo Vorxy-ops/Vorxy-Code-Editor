@@ -146,7 +146,7 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
         Expanded(
           child: GestureDetector(
             onTap: () {
-              _focusNode.requestFocus();
+              FocusScope.of(context).requestFocus(_focusNode);
             },
             child: Container(
               decoration: BoxDecoration(
@@ -221,7 +221,7 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
                                   color: Colors.transparent,
                                   fontSize: 14,
                                   fontFamily: 'monospace',
-                                  height: 1.2,
+                                  height: 1.0,
                                 ),
                                 decoration: const InputDecoration(
                                   border: InputBorder.none,
