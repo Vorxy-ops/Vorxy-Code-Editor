@@ -25,6 +25,7 @@ class CodeEditorWidget extends StatefulWidget {
 class _CodeEditorWidgetState extends State<CodeEditorWidget> {
   late CodeLineEditingController _controller;
   late CodeFindController _findController;
+  late CodeAutocompleteController _autocompleteController;
   final FocusNode _focusNode = FocusNode();
   String _displayCode = '';
   int _cursorPosition = 0;
@@ -43,6 +44,7 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
       language: _getLanguageMode(widget.language),
     );
     _findController = CodeFindController();
+    _autocompleteController = CodeAutocompleteController();
     _displayCode = widget.code;
     _controller.addListener(() {
       setState(() {
@@ -117,6 +119,112 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
         input: '',
       );
     }
+  }
+
+  List<CodeAutocompleteOption> _getAutocompleteOptions(String text) {
+    final keywords = {
+      'python': [
+        'def', 'if', 'else', 'elif', 'for', 'while', 'return', 'import', 'from',
+        'class', 'try', 'except', 'finally', 'with', 'as', 'lambda', 'yield',
+        'global', 'nonlocal', 'True', 'False', 'None', 'and', 'or', 'not', 'in',
+        'is', 'pass', 'break', 'continue'
+      ],
+      'javascript': [
+        'function', 'if', 'else', 'for', 'while', 'return', 'import', 'export',
+        'class', 'try', 'catch', 'finally', 'throw', 'new', 'this', 'super',
+        'const', 'let', 'var', 'async', 'await', 'true', 'false', 'null',
+        'undefined', 'break', 'continue', 'switch', 'case', 'default'
+      ],
+      'c': [
+        'int', 'char', 'float', 'double', 'void', 'if', 'else', 'for', 'while',
+        'do', 'return', 'switch', 'case', 'default', 'break', 'continue',
+        'struct', 'union', 'enum', 'typedef', 'sizeof', 'static', 'const',
+        'volatile', 'extern', 'register', 'goto', 'long', 'short', 'signed',
+        'unsigned'
+      ],
+      'cpp': [
+        'int', 'char', 'float', 'double', 'void', 'bool', 'if', 'else', 'for',
+        'while', 'do', 'return', 'switch', 'case', 'default', 'break', 'continue',
+        'class', 'struct', 'union', 'enum', 'typedef', 'namespace', 'using',
+        'public', 'private', 'protected', 'virtual', 'override', 'final',
+        'constexpr', 'nullptr', 'auto', 'decltype', 'noexcept', 'template',
+        'typename', 'static_cast', 'dynamic_cast', 'const_cast', 'reinterpret_cast'
+      ],
+      'java': [
+        'public', 'private', 'protected', 'static', 'final', 'abstract', 'class',
+        'interface', 'extends', 'implements', 'new', 'return', 'void', 'int',
+        'char', 'float', 'double', 'boolean', 'long', 'short', 'byte', 'if',
+        'else', 'for', 'while', 'do', 'switch', 'case', 'default', 'break',
+        'continue', 'try', 'catch', 'finally', 'throw', 'throws', 'import',
+        'package', 'super', 'this', 'true', 'false', 'null', 'enum', 'record'
+      ],
+      'csharp': [
+        'public', 'private', 'protected', 'internal', 'static', 'readonly',
+        'const', 'abstract', 'sealed', 'class', 'interface', 'struct', 'enum',
+        'new', 'return', 'void', 'int', 'char', 'float', 'double', 'bool',
+        'string', 'object', 'if', 'else', 'for', 'while', 'do', 'switch',
+        'case', 'default', 'break', 'continue', 'try', 'catch', 'finally',
+        'throw', 'using', 'namespace', 'var', 'dynamic', 'true', 'false', 'null'
+      ],
+      'vb': [
+        'Public', 'Private', 'Friend', 'Protected', 'Dim', 'Const', 'Static',
+        'Shared', 'ReadOnly', 'WriteOnly', 'Class', 'Module', 'Interface',
+        'Structure', 'Enum', 'Function', 'Sub', 'Return', 'If', 'Else',
+        'ElseIf', 'Select', 'Case', 'For', 'While', 'Do', 'Loop', 'Try',
+        'Catch', 'Finally', 'Throw', 'New', 'Imports', 'Namespace', 'True',
+        'False', 'Nothing', 'Inherits', 'Implements', 'Overrides', 'NotOverridable',
+        'MustOverride', 'Overloads', 'Shadows', 'Default', 'WithEvents'
+      ],
+      'sql': [
+        'SELECT', 'INSERT', 'UPDATE', 'DELETE', 'CREATE', 'ALTER', 'DROP',
+        'TABLE', 'VIEW', 'INDEX', 'TRIGGER', 'PROCEDURE', 'FUNCTION', 'FROM',
+        'WHERE', 'JOIN', 'INNER', 'LEFT', 'RIGHT', 'FULL', 'GROUP', 'BY',
+        'HAVING', 'ORDER', 'ASC', 'DESC', 'DISTINCT', 'COUNT', 'SUM', 'AVG',
+        'MAX', 'MIN', 'AS', 'IN', 'BETWEEN', 'LIKE', 'IS', 'NULL', 'NOT',
+        'AND', 'OR', 'UNION', 'ALL', 'EXISTS', 'CASE', 'WHEN', 'THEN', 'ELSE'
+      ],
+      'r': [
+        'function', 'if', 'else', 'for', 'while', 'repeat', 'break', 'next',
+        'return', 'library', 'require', 'source', 'setwd', 'getwd', 'list',
+        'data.frame', 'matrix', 'array', 'factor', 'c', 'sum', 'mean', 'sd',
+        'var', 'cor', 'lm', 'glm', 'plot', 'hist', 'boxplot', 'ggplot', 'aes',
+        'geom', 'stat', 'theme', 'scale', 'filter', 'mutate', 'select', 'arrange',
+        'summarise', 'group_by', 'ungroup', 'inner_join', 'left_join', 'right_join'
+      ],
+      'rust': [
+        'fn', 'let', 'mut', 'if', 'else', 'for', 'while', 'loop', 'match',
+        'return', 'break', 'continue', 'struct', 'enum', 'trait', 'impl',
+        'pub', 'crate', 'mod', 'use', 'extern', 'unsafe', 'async', 'await',
+        'move', 'ref', 'static', 'const', 'type', 'dyn', 'self', 'super',
+        'true', 'false', 'Some', 'None', 'Ok', 'Err', 'Result', 'Option',
+        'Vec', 'String', 'println', 'format', 'assert', 'panic'
+      ],
+      'html': [
+        '<!DOCTYPE', '<html>', '</html>', '<head>', '</head>', '<body>',
+        '</body>', '<title>', '</title>', '<h1>', '</h1>', '<h2>', '</h2>',
+        '<h3>', '</h3>', '<p>', '</p>', '<br>', '<hr>', '<a>', '</a>',
+        '<img>', '<div>', '</div>', '<span>', '</span>', '<ul>', '</ul>',
+        '<ol>', '</ol>', '<li>', '</li>', '<table>', '</table>', '<tr>',
+        '</tr>', '<td>', '</td>', '<th>', '</th>', '<form>', '</form>',
+        '<input>', '<button>', '</button>', '<select>', '</select>',
+        '<option>', '</option>', '<textarea>', '</textarea>', '<script>',
+        '</script>', '<style>', '</style>', '<link>', '<meta>', '<nav>',
+        '</nav>', '<header>', '</header>', '<footer>', '</footer>',
+        '<section>', '</section>', '<article>', '</article>', '<aside>',
+        '</aside>', '<main>', '</main>', '<figure>', '</figure>', '<figcaption>',
+        '</figcaption>'
+      ],
+    };
+
+    final languageKeywords = keywords[_getLanguageMode(widget.language)] ?? [];
+    final lowerText = text.toLowerCase();
+    return languageKeywords
+        .where((keyword) => keyword.toLowerCase().startsWith(lowerText))
+        .map((keyword) => CodeAutocompleteOption(
+              text: keyword,
+              score: keyword.length,
+            ))
+        .toList();
   }
 
   @override
@@ -235,8 +343,58 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
                   child: CodeEditor(
                     controller: _controller,
                     findController: _findController,
+                    autocompleteController: _autocompleteController,
                     focusNode: _focusNode,
                     padding: const EdgeInsets.all(12),
+                    autocompleteBuilder: (context, controller, value, options) {
+                      if (options.isEmpty) return const SizedBox.shrink();
+                      return Container(
+                        margin: const EdgeInsets.only(top: 4),
+                        constraints: const BoxConstraints(maxHeight: 200),
+                        decoration: BoxDecoration(
+                          color: isDark ? Colors.grey.shade900 : Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: isDark ? Colors.grey.shade800 : Colors.grey.shade300,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.2),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: options.length,
+                          itemBuilder: (context, index) {
+                            final option = options[index];
+                            return ListTile(
+                              title: Text(
+                                option.text,
+                                style: TextStyle(
+                                  color: isDark ? Colors.white : Colors.black,
+                                  fontSize: 13,
+                                  fontFamily: 'monospace',
+                                ),
+                              ),
+                              onTap: () {
+                                _autocompleteController.complete(option);
+                              },
+                            );
+                          },
+                        ),
+                      );
+                    },
+                    autocompleteOptionsBuilder: (controller, text) {
+                      final prefix = text.substring(0, _controller.selection.start);
+                      final match = RegExp(r'[a-zA-Z_<>/]+$').firstMatch(prefix);
+                      if (match == null) return [];
+                      final word = match.group(0) ?? '';
+                      if (word.length < 1) return [];
+                      return _getAutocompleteOptions(word);
+                    },
                     indicatorBuilder: (context, controller, index) {
                       return CodeEditorIndicator(
                         controller: controller,
@@ -281,6 +439,7 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
   void dispose() {
     _controller.dispose();
     _findController.dispose();
+    _autocompleteController.dispose();
     _focusNode.dispose();
     super.dispose();
   }
