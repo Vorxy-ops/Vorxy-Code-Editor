@@ -12,7 +12,9 @@ workflows:
           rm -rf android/.gradle
           rm -rf android/app/build
       - name: Install dependencies
-        script: flutter pub get
+        script: |
+          flutter clean
+          flutter pub get
       - name: Generate icons
         script: |
           if [ -f "pubspec.yaml" ] && grep -q "flutter_launcher_icons" pubspec.yaml; then
