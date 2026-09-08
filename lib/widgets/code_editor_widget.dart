@@ -22,7 +22,7 @@ class CodeEditorWidget extends StatefulWidget {
 }
 
 class _CodeEditorWidgetState extends State<CodeEditorWidget> {
-  late CodeController _controller;
+  late TextEditingController _controller;
   final FocusNode _focusNode = FocusNode();
   String _displayCode = '';
   int _cursorPosition = 0;
@@ -35,10 +35,7 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
   @override
   void initState() {
     super.initState();
-    _controller = CodeController(
-      text: widget.code,
-      language: _getLanguageMode(widget.language),
-    );
+    _controller = TextEditingController(text: widget.code);
     _displayCode = widget.code;
     _controller.addListener(() {
       setState(() {
@@ -60,9 +57,6 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
         _controller.selection = currentSelection;
       }
       _cursorPosition = _controller.selection.baseOffset;
-    }
-    if (oldWidget.language != widget.language) {
-      _controller.language = _getLanguageMode(widget.language);
     }
   }
 
@@ -153,7 +147,6 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
             ),
             child: CodeEditor(
               controller: _controller,
-              language: _getLanguageMode(widget.language),
               theme: isDark ? EditorTheme.dark() : EditorTheme.light(),
               enableGutter: true,
               readOnly: false,
