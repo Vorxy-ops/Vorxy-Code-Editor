@@ -27,6 +27,7 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
   final FocusNode _focusNode = FocusNode();
   String _displayCode = '';
   int _cursorPosition = 0;
+  String _currentLanguage = '';
 
   String _getTranslation(String key) {
     final translations = AppConstants.translations[widget.currentLanguage] ?? AppConstants.translations['ru']!;
@@ -36,6 +37,7 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
   @override
   void initState() {
     super.initState();
+    _currentLanguage = widget.language;
     _controller = EditorController(
       text: widget.code,
       language: _getLanguageMode(widget.language),
@@ -48,12 +50,16 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
       });
       widget.onCodeChanged(_controller.text);
     });
-    _model = EditorModel(
+    _model = _createModel(widget.code, widget.language);
+  }
+
+  EditorModel _createModel(String code, String language) {
+    return EditorModel(
       files: [
         FileEditor(
-          name: 'main${_getExtension(widget.language)}',
-          language: _getLanguageMode(widget.language),
-          code: widget.code,
+          name: 'main${_getExtension(language)}',
+          language: _getLanguageMode(language),
+          code: code,
         ),
       ],
       styleOptions: EditorModelStyleOptions(
@@ -80,24 +86,11 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
       _cursorPosition = _controller.selection.baseOffset;
     }
     if (oldWidget.language != widget.language) {
+      _currentLanguage = widget.language;
       _controller.language = _getLanguageMode(widget.language);
-      _model = EditorModel(
-        files: [
-          FileEditor(
-            name: 'main${_getExtension(widget.language)}',
-            language: _getLanguageMode(widget.language),
-            code: widget.code,
-          ),
-        ],
-        styleOptions: EditorModelStyleOptions(
-          fontSize: 14,
-          fontFamily: 'monospace',
-          backgroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.black : Colors.white,
-          textStyle: TextStyle(
-            color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
-          ),
-        ),
-      );
+      setState(() {
+        _model = _createModel(_controller.text, widget.language);
+      });
     }
   }
 
