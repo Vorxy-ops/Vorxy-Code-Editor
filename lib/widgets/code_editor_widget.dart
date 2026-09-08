@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lite_code_editor/lite_code_editor.dart';
+import 'package:code_editor/code_editor.dart';
 import '../utils/theme.dart';
 import '../utils/constants.dart';
 
@@ -22,7 +22,8 @@ class CodeEditorWidget extends StatefulWidget {
 }
 
 class _CodeEditorWidgetState extends State<CodeEditorWidget> {
-  late CodeEditorController _controller;
+  late EditorModel _model;
+  late EditorController _controller;
   final FocusNode _focusNode = FocusNode();
   String _displayCode = '';
   int _cursorPosition = 0;
@@ -35,8 +36,9 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
   @override
   void initState() {
     super.initState();
-    _controller = CodeEditorController(
-      initialCode: widget.code,
+    _controller = EditorController(
+      text: widget.code,
+      language: _getLanguageMode(widget.language),
     );
     _displayCode = widget.code;
     _controller.addListener(() {
@@ -46,6 +48,23 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
       });
       widget.onCodeChanged(_controller.text);
     });
+    _model = EditorModel(
+      files: [
+        FileEditor(
+          name: 'main${_getExtension(widget.language)}',
+          language: _getLanguageMode(widget.language),
+          code: widget.code,
+        ),
+      ],
+      styleOptions: EditorModelStyleOptions(
+        fontSize: 14,
+        fontFamily: 'monospace',
+        backgroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.black : Colors.white,
+        textStyle: TextStyle(
+          color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
+        ),
+      ),
+    );
   }
 
   @override
@@ -59,6 +78,60 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
         _controller.selection = currentSelection;
       }
       _cursorPosition = _controller.selection.baseOffset;
+    }
+    if (oldWidget.language != widget.language) {
+      _controller.language = _getLanguageMode(widget.language);
+      _model = EditorModel(
+        files: [
+          FileEditor(
+            name: 'main${_getExtension(widget.language)}',
+            language: _getLanguageMode(widget.language),
+            code: widget.code,
+          ),
+        ],
+        styleOptions: EditorModelStyleOptions(
+          fontSize: 14,
+          fontFamily: 'monospace',
+          backgroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.black : Colors.white,
+          textStyle: TextStyle(
+            color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
+          ),
+        ),
+      );
+    }
+  }
+
+  String _getExtension(String language) {
+    switch (language) {
+      case 'Python': return '.py';
+      case 'JavaScript': return '.js';
+      case 'C': return '.c';
+      case 'C++': return '.cpp';
+      case 'Java': return '.java';
+      case 'C#': return '.cs';
+      case 'Visual Basic': return '.vb';
+      case 'SQL': return '.sql';
+      case 'R': return '.r';
+      case 'Rust': return '.rs';
+      case 'HTML': return '.html';
+      default: return '.txt';
+    }
+  }
+
+  String _getLanguageMode(String language) {
+    switch (language) {
+      case 'Python': return 'python';
+      case 'JavaScript': return 'javascript';
+      case 'C': return 'c';
+      case 'C++': return 'cpp';
+      case 'Java': return 'java';
+      case 'C#': return 'csharp';
+      case 'Visual Basic': return 'vb';
+      case 'SQL': return 'sql';
+      case 'R': return 'r';
+      case 'Rust': return 'rust';
+      case 'HTML': return 'html';
+      default: return 'python';
     }
   }
 
@@ -131,8 +204,12 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
               border: Border.all(color: isDark ? Colors.grey.shade800 : Colors.grey.shade400),
             ),
             child: CodeEditor(
-              controller: _controller,
-              theme: isDark ? EditorTheme.dark() : EditorTheme.light(),
+              model: _model,
+              edit: true,
+              disableNavigationbar: true,
+              onChanged: (value) {
+                widget.onCodeChanged(value.code);
+              },
             ),
           ),
         ),
