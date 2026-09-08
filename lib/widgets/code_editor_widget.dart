@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:code_editor/code_editor.dart';
+import 'package:code_field/code_field.dart';
 import '../utils/theme.dart';
 import '../utils/constants.dart';
 
@@ -22,12 +22,10 @@ class CodeEditorWidget extends StatefulWidget {
 }
 
 class _CodeEditorWidgetState extends State<CodeEditorWidget> {
-  late EditorModel _model;
-  late EditorController _controller;
+  late CodeController _controller;
   final FocusNode _focusNode = FocusNode();
   String _displayCode = '';
   int _cursorPosition = 0;
-  String _currentLanguage = '';
 
   String _getTranslation(String key) {
     final translations = AppConstants.translations[widget.currentLanguage] ?? AppConstants.translations['ru']!;
@@ -37,8 +35,7 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
   @override
   void initState() {
     super.initState();
-    _currentLanguage = widget.language;
-    _controller = EditorController(
+    _controller = CodeController(
       text: widget.code,
       language: _getLanguageMode(widget.language),
     );
@@ -50,27 +47,6 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
       });
       widget.onCodeChanged(_controller.text);
     });
-    _model = _createModel(widget.code, widget.language);
-  }
-
-  EditorModel _createModel(String code, String language) {
-    return EditorModel(
-      files: [
-        FileEditor(
-          name: 'main${_getExtension(language)}',
-          language: _getLanguageMode(language),
-          code: code,
-        ),
-      ],
-      styleOptions: EditorModelStyleOptions(
-        fontSize: 14,
-        fontFamily: 'monospace',
-        backgroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.black : Colors.white,
-        textStyle: TextStyle(
-          color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
-        ),
-      ),
-    );
   }
 
   @override
@@ -86,28 +62,7 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
       _cursorPosition = _controller.selection.baseOffset;
     }
     if (oldWidget.language != widget.language) {
-      _currentLanguage = widget.language;
       _controller.language = _getLanguageMode(widget.language);
-      setState(() {
-        _model = _createModel(_controller.text, widget.language);
-      });
-    }
-  }
-
-  String _getExtension(String language) {
-    switch (language) {
-      case 'Python': return '.py';
-      case 'JavaScript': return '.js';
-      case 'C': return '.c';
-      case 'C++': return '.cpp';
-      case 'Java': return '.java';
-      case 'C#': return '.cs';
-      case 'Visual Basic': return '.vb';
-      case 'SQL': return '.sql';
-      case 'R': return '.r';
-      case 'Rust': return '.rs';
-      case 'HTML': return '.html';
-      default: return '.txt';
     }
   }
 
@@ -196,13 +151,31 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
               borderRadius: BorderRadius.circular(8),
               border: Border.all(color: isDark ? Colors.grey.shade800 : Colors.grey.shade400),
             ),
-            child: CodeEditor(
-              model: _model,
-              edit: true,
-              disableNavigationbar: true,
-              onChanged: (value) {
-                widget.onCodeChanged(value.code);
-              },
+            child: CodeField(
+              controller: _controller,
+              language: _getLanguageMode(widget.language),
+              wrap: false,
+              readOnly: false,
+              fontSize: 14,
+              padding: const EdgeInsets.all(12),
+              placeholder: _getTranslation('code_ready'),
+              theme: CodeFieldTheme(
+                backgroundColor: isDark ? Colors.black : Colors.white,
+                textStyle: TextStyle(
+                  color: isDark ? Colors.white : Colors.black,
+                  fontSize: 14,
+                  fontFamily: 'monospace',
+                ),
+                gutterStyle: GutterStyle(
+                  textStyle: TextStyle(
+                    color: isDark ? Colors.grey.shade600 : Colors.grey.shade700,
+                    fontSize: 13,
+                    fontFamily: 'monospace',
+                  ),
+                  backgroundColor: isDark ? Colors.grey.shade900 : Colors.grey.shade200,
+                  width: 40,
+                ),
+              ),
             ),
           ),
         ),
