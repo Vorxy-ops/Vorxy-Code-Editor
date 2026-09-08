@@ -76,23 +76,6 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
     return '$lines ${_getTranslation('line')}, $chars ${_getTranslation('chars')}';
   }
 
-  String _getLanguageMode(String language) {
-    switch (language) {
-      case 'Python': return 'python';
-      case 'JavaScript': return 'javascript';
-      case 'C': return 'c';
-      case 'C++': return 'cpp';
-      case 'Java': return 'java';
-      case 'C#': return 'csharp';
-      case 'Visual Basic': return 'vb';
-      case 'SQL': return 'sql';
-      case 'R': return 'r';
-      case 'Rust': return 'rust';
-      case 'HTML': return 'html';
-      default: return 'python';
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -148,9 +131,6 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
             child: CodeEditor(
               controller: _controller,
               theme: isDark ? EditorTheme.dark() : EditorTheme.light(),
-              enableGutter: true,
-              readOnly: false,
-              wrap: false,
               autocomplete: true,
             ),
           ),
