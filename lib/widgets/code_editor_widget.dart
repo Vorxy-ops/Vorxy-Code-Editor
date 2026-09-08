@@ -131,7 +131,6 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
             child: CodeEditor(
               controller: _controller,
               theme: isDark ? EditorTheme.dark() : EditorTheme.light(),
-              autocomplete: true,
             ),
           ),
         ),
