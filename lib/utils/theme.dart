@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_highlight/themes/vs.dart';
 
 class AppTheme {
   static const Color primaryPurple = Color(0xFF1A0B2E);
@@ -104,8 +103,4 @@ class AppTheme {
       elevation: 8,
     ),
   );
-
-  static Map<String, TextStyle> get codeTheme {
-    return vsTheme;
-  }
 }
