@@ -22,7 +22,7 @@ class CodeEditorWidget extends StatefulWidget {
 }
 
 class _CodeEditorWidgetState extends State<CodeEditorWidget> {
-  late CodeEditorController _controller;
+  late final CodeController _controller;
   final FocusNode _focusNode = FocusNode();
   String _displayCode = '';
   int _cursorPosition = 0;
@@ -35,7 +35,7 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
   @override
   void initState() {
     super.initState();
-    _controller = CodeEditorController(text: widget.code);
+    _controller = CodeController(text: widget.code);
     _displayCode = widget.code;
     _controller.addListener(() {
       setState(() {
