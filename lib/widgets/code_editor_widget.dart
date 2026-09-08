@@ -35,8 +35,9 @@ class _CodeEditorWidgetState extends State<CodeEditorWidget> {
   @override
   void initState() {
     super.initState();
-    _controller = CodeEditorController();
-    _controller.text = widget.code;
+    _controller = CodeEditorController(
+      initialCode: widget.code,
+    );
     _displayCode = widget.code;
     _controller.addListener(() {
       setState(() {
